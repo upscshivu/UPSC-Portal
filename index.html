@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPSC Study Portal</title>
+<style>
+:root{
+  --bg:#0F1117;--surface:#181C27;--surface2:#1E2335;--border:#2A2F45;--border2:#333856;
+  --text:#E8EAF0;--text-muted:#7B82A0;--text-dim:#4A5070;
+  --memorize:#2563EB;--memorize-bg:#0D1B3E;--memorize-border:#1E3A7A;
+  --recall:#DC2626;--recall-bg:#2D0A0A;--recall-border:#5A1414;
+  --understand:#7C3AED;--understand-bg:#1A0D33;--understand-border:#3D1A7A;
+  --solve:#EA580C;--solve-bg:#2D1200;--solve-border:#5A2800;
+  --review:#0F766E;--review-bg:#051F1D;--review-border:#0F4A45;
+  --highyield:#F59E0B;--highyield-bg:#2D1F00;--highyield-border:#5A3D00;
+  --mastered:#16A34A;--mastered-bg:#0A2010;--mastered-border:#1A4A28;
+  --pyq:#6366F1;--pyq-bg:#12103A;--pyq-border:#2D2B7A;
+  --flag:#EF4444;--radius:12px;--radius-sm:8px;--radius-xs:6px;--tr:0.2s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;overflow-x:hidden}
+
+/* AUTH SCREENS */
+.auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:20px;overflow-y:auto}
+.auth-logo{font-size:48px;margin-bottom:8px}
+.auth-title{font-size:24px;font-weight:800;background:linear-gradient(135deg,#7C3AED,#2563EB);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px}
+.auth-sub{color:var(--text-muted);font-size:13px;text-align:center;margin-bottom:28px}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:380px}
+.auth-card h2{font-size:17px;font-weight:700;margin-bottom:20px;color:var(--text)}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.04em}
+.form-input{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:14px;outline:none;transition:border-color var(--tr)}
+.form-input:focus{border-color:#7C3AED}
+.form-input::placeholder{color:var(--text-dim)}
+select.form-input option{background:var(--surface2);color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-hint{font-size:11px;color:var(--text-dim);margin-top:4px}
+.form-error{font-size:12px;color:var(--flag);margin-top:6px;min-height:16px}
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;border-radius:var(--radius-xs);color:white;font-size:14px;font-weight:700;cursor:pointer;transition:opacity var(--tr);margin-top:6px}
+.btn-primary:hover{opacity:0.9}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.btn-secondary{width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);margin-top:8px}
+.btn-secondary:hover{border-color:#7C3AED;color:var(--text)}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)}
+.auth-switch span{color:#7C3AED;cursor:pointer;font-weight:600}
+.auth-switch span:hover{text-decoration:underline}
+
+
+
+
+
+
+
+
+.loading-overlay{position:fixed;inset:0;background:#0F111799;display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(4px)}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:#7C3AED;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--text-muted);font-size:13px;margin-top:12px;text-align:center}
+
+/* NAV */
+#app{display:none}
+nav{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;gap:10px;height:56px}
+.nav-menu-btn{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;transition:color var(--tr)}
+.nav-menu-btn:hover{color:var(--text)}
+.nav-back-btn{background:none;border:1px solid var(--border);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;padding:5px 10px;border-radius:var(--radius-xs);flex-shrink:0;transition:all var(--tr);display:none;align-items:center;gap:4px}
+.nav-back-btn:hover{border-color:#7C3AED;color:var(--text)}
+.nav-back-btn.visible{display:flex}
+.nav-logo{font-size:18px;flex-shrink:0}
+.nav-title{font-weight:800;font-size:15px;background:linear-gradient(135deg,#7C3AED,#2563EB);-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex:1}
+.nav-bc{display:flex;align-items:center;gap:4px;color:var(--text-muted);font-size:12px;flex:1;min-width:0;overflow:hidden}
+.bc-item{cursor:pointer;white-space:nowrap;padding:2px 4px;border-radius:4px;transition:color var(--tr);flex-shrink:0}
+.bc-item:hover{color:var(--text)}.bc-item.cur{color:var(--text);font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.bc-sep{color:var(--text-dim);flex-shrink:0}
+.lang-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:20px;overflow:hidden;flex-shrink:0}
+.lang-btn{padding:4px 11px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text-muted);border:none;background:none;transition:all var(--tr)}
+.lang-btn.active{background:#7C3AED;color:white;border-radius:20px}
+
+/* SIDE MENU */
+.side-overlay{position:fixed;inset:0;background:#00000060;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.3s;backdrop-filter:blur(2px)}
+.side-overlay.open{opacity:1;pointer-events:all}
+.side-menu{position:fixed;left:0;top:0;bottom:0;width:280px;background:var(--surface);border-right:1px solid var(--border);z-index:201;transform:translateX(-100%);transition:transform 0.3s ease;display:flex;flex-direction:column}
+.side-menu.open{transform:translateX(0)}
+.side-menu-header{padding:20px 16px;border-bottom:1px solid var(--border)}
+.side-user-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#2563EB);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:white;margin-bottom:10px}
+.side-user-name{font-weight:700;font-size:16px}
+.side-user-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+.side-menu-items{flex:1;overflow-y:auto;padding:8px 0}
+.side-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background var(--tr);font-size:14px;color:var(--text-muted);border:none;background:none;width:100%;text-align:left}
+.side-item:hover{background:var(--surface2);color:var(--text)}
+.side-item.active{color:#7C3AED;background:var(--understand-bg)}
+.side-item-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.side-item-label{font-weight:600}
+.side-divider{height:1px;background:var(--border);margin:8px 16px}
+.side-menu-footer{padding:12px 16px;border-top:1px solid var(--border)}
+.side-signout-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background var(--tr);font-size:14px;color:var(--recall);background:var(--recall-bg);border:1px solid var(--recall-border);border-radius:var(--radius-xs);width:100%;font-weight:600}
+.side-signout-btn:hover{opacity:0.85}
+
+/* PAGES */
+.page{display:none;padding:18px;max-width:960px;margin:0 auto}.page.active{display:block}
+.pg-hdr{margin-bottom:18px}.pg-hdr h1{font-size:20px;font-weight:800;margin-bottom:3px}
+.pg-hdr p{color:var(--text-muted);font-size:13px}
+.sec-lbl{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px}
+
+/* HOME METRICS */
+.welcome-bar{background:linear-gradient(135deg,var(--understand-bg),var(--memorize-bg));border:1px solid var(--understand-border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+.welcome-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#2563EB);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;flex-shrink:0}
+.welcome-name{font-weight:800;font-size:16px}
+.welcome-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+.metrics-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px}
+.metrics-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(min-width:480px){.metrics-grid{grid-template-columns:repeat(6,1fr)}}
+.mc{text-align:center;padding:10px 6px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.mc-num{font-size:22px;font-weight:800;line-height:1}.mc-lbl{font-size:10px;color:var(--text-muted);margin-top:3px}
+.mn-pur{color:var(--understand)}.mn-gray{color:var(--text-dim)}.mn-blue{color:var(--memorize)}.mn-grn{color:var(--mastered)}.mn-red{color:var(--recall)}.mn-amb{color:var(--highyield)}
+
+/* STAGE CARDS */
+.stage-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:540px){.stage-grid{grid-template-columns:1fr}}
+.stage-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all var(--tr);position:relative;overflow:hidden}
+.stage-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stage-card.prelims::before{background:linear-gradient(90deg,#2563EB,#7C3AED)}
+.stage-card.mains::before{background:linear-gradient(90deg,#EA580C,#DC2626)}
+.stage-card:hover{border-color:#7C3AED;transform:translateY(-2px);box-shadow:0 8px 24px #7C3AED15}
+.stage-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 9px;border-radius:20px;background:var(--surface2);color:var(--text-muted);margin-bottom:8px;font-weight:600}
+.stage-card h3{font-size:17px;font-weight:800;margin-bottom:3px}.stage-card p{color:var(--text-muted);font-size:12px;margin-bottom:12px}
+.prog-bar{height:5px;background:var(--border);border-radius:3px;margin-bottom:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#2563EB,#7C3AED);transition:width 0.6s ease}
+.prog-lbl{font-size:11px;color:var(--text-muted)}
+
+/* PAPER / TOPIC / CHAPTER CARDS */
+.paper-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.paper-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all var(--tr)}
+.paper-card:hover{border-color:#7C3AED;transform:translateY(-1px)}
+.paper-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.paper-icon{font-size:22px;flex-shrink:0}
+.paper-name{font-weight:700;font-size:14px;margin-bottom:2px}.paper-desc{color:var(--text-muted);font-size:12px}
+.paper-stats{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.sp{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:600;border:1px solid}
+.sp-gray{color:var(--text-muted);border-color:var(--border);background:var(--surface2)}
+.sp-grn{color:var(--mastered);border-color:var(--mastered-border);background:var(--mastered-bg)}
+.sp-blue{color:var(--memorize);border-color:var(--memorize-border);background:var(--memorize-bg)}
+.mini-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.mini-fill{height:100%;border-radius:2px;background:#7C3AED;transition:width 0.5s ease}
+.topic-list{display:flex;flex-direction:column;gap:10px}
+.topic-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all var(--tr)}
+.topic-card:hover{border-color:#7C3AED;background:var(--surface2)}
+.topic-top{display:flex;align-items:center;gap:10px}
+.topic-icon{font-size:20px;flex-shrink:0}.topic-name{font-weight:700;font-size:15px}
+.topic-meta{font-size:12px;color:var(--text-muted);margin-top:1px}.topic-arr{color:var(--text-dim);font-size:18px;margin-left:auto}
+.topic-stats{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;padding-left:30px}
+.chapter-cards{display:flex;flex-direction:column;gap:10px}
+.chapter-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all var(--tr);position:relative;overflow:hidden}
+.chapter-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--border2)}
+.chapter-card.st-seen::before{background:var(--memorize)}.chapter-card.st-learned::before{background:var(--mastered)}.chapter-card.st-flagged::before{background:var(--flag)}
+.chapter-card:hover{border-color:#7C3AED;transform:translateY(-1px)}
+.cc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.cc-num{width:28px;height:28px;border-radius:var(--radius-xs);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-muted);flex-shrink:0;margin-top:2px}
+.cc-name{font-weight:700;font-size:14px;margin-bottom:3px}.cc-last{font-size:11px;color:var(--text-dim)}
+.cc-sections{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;padding-left:38px}
+.sec-pill{display:flex;align-items:center;gap:3px;font-size:11px;padding:2px 7px;border-radius:6px;font-weight:600;border:1px solid}
+.sp-done{background:var(--mastered-bg);border-color:var(--mastered-border);color:var(--mastered)}
+.sp-partial{background:var(--highyield-bg);border-color:var(--highyield-border);color:var(--highyield)}
+.sp-none{background:var(--surface2);border-color:var(--border);color:var(--text-dim)}
+.cc-tags{display:flex;gap:5px;flex-wrap:wrap;align-items:center;padding-left:38px;margin-bottom:8px}
+.ct{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:600}
+.ct-nt{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border)}
+.ct-seen{background:var(--memorize-bg);color:var(--memorize);border:1px solid var(--memorize-border)}
+.ct-flag{background:var(--recall-bg);color:var(--flag)}.ct-learned{background:var(--mastered-bg);color:var(--mastered)}.ct-imp{background:var(--highyield-bg);color:var(--highyield)}.ct-forget{background:var(--recall-bg);color:var(--recall)}.ct-rev{background:var(--memorize-bg);color:var(--memorize)}
+.ct-nonotes{background:var(--surface2);color:var(--text-dim);border:1px dashed var(--border)}
+.cc-prog{padding-left:38px}.cc-prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.cc-prog-fill{height:100%;border-radius:2px;transition:width 0.5s ease}.cc-prog-lbl{font-size:10px;color:var(--text-dim);margin-top:3px}
+
+/* CHAPTER CONTENT */
+.ch-hdr{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.ch-hdr h1{font-size:18px;font-weight:800;margin-bottom:3px}.ch-bc{font-size:11px;color:var(--text-muted);margin-bottom:14px}
+.sec-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+@media(min-width:480px){.sec-metrics{grid-template-columns:repeat(6,1fr)}}
+.smc{padding:9px 6px;border-radius:var(--radius-sm);border:1px solid;text-align:center}
+.smc.understand{background:var(--understand-bg);border-color:var(--understand-border)}.smc.review{background:var(--review-bg);border-color:var(--review-border)}.smc.memorize{background:var(--memorize-bg);border-color:var(--memorize-border)}.smc.recall{background:var(--recall-bg);border-color:var(--recall-border)}.smc.pyq{background:var(--pyq-bg);border-color:var(--pyq-border)}.smc.solve{background:var(--solve-bg);border-color:var(--solve-border)}
+.smc-icon{font-size:14px;margin-bottom:2px}.smc-name{font-size:9px;color:var(--text-muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em}
+.smc-rev{font-size:17px;font-weight:800;line-height:1}.smc-sub{font-size:9px;color:var(--text-dim);margin-top:2px}.smc-timer{font-size:9px;color:var(--highyield);min-height:11px}
+.understand .smc-rev{color:var(--understand)}.review .smc-rev{color:var(--review)}.memorize .smc-rev{color:var(--memorize)}.recall .smc-rev{color:var(--recall)}.pyq .smc-rev{color:var(--pyq)}.solve .smc-rev{color:var(--solve)}
+.tag-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tag-lbl{font-size:12px;color:var(--text-muted);flex-shrink:0}
+.tag-btn{padding:4px 11px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);transition:all var(--tr)}
+.tag-btn.a-flag{background:var(--recall-bg);color:var(--flag);border-color:var(--flag)}.tag-btn.a-learned{background:var(--mastered-bg);color:var(--mastered);border-color:var(--mastered)}.tag-btn.a-imp{background:var(--highyield-bg);color:var(--highyield);border-color:var(--highyield)}.tag-btn.a-forgetting{background:var(--recall-bg);color:var(--recall);border-color:var(--recall)}.tag-btn.a-revision{background:var(--memorize-bg);color:var(--memorize);border-color:var(--memorize)}
+.lv-txt{font-size:11px;color:var(--text-dim)}
+.sec-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none}
+.sec-tabs::-webkit-scrollbar{display:none}
+.sec-tab{padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all var(--tr);flex-shrink:0;position:relative}
+.sec-tab.active{color:white;border-color:transparent}
+.sec-tab[data-s="concepts"].active{background:var(--understand)}.sec-tab[data-s="theory"].active{background:var(--review)}.sec-tab[data-s="facts"].active{background:var(--memorize)}.sec-tab[data-s="dates"].active{background:var(--recall)}.sec-tab[data-s="pyqs"].active{background:var(--pyq)}.sec-tab[data-s="brainteasers"].active{background:var(--solve)}
+.rev-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:800;margin-left:4px;background:rgba(255,255,255,0.2);color:white}
+.timer-dot{width:6px;height:6px;border-radius:50%;background:var(--highyield);display:inline-block;margin-left:4px;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.sec-content{display:none}.sec-content.active{display:block}
+.sh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-xs);margin-bottom:14px;font-weight:700;font-size:13px;border-left:3px solid}
+.sh.understand{background:var(--understand-bg);border-color:var(--understand);color:var(--understand)}.sh.review{background:var(--review-bg);border-color:var(--review);color:var(--review)}.sh.memorize{background:var(--memorize-bg);border-color:var(--memorize);color:var(--memorize)}.sh.recall{background:var(--recall-bg);border-color:var(--recall);color:var(--recall)}.sh.pyq{background:var(--pyq-bg);border-color:var(--pyq);color:var(--pyq)}.sh.solve{background:var(--solve-bg);border-color:var(--solve);color:var(--solve)}
+.concept-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);margin-bottom:7px;overflow:hidden}
+.concept-btn{width:100%;text-align:left;padding:12px 14px;background:none;border:none;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background var(--tr)}
+.concept-btn:hover{background:var(--surface2)}.con-arr{transition:transform var(--tr);color:var(--understand);font-size:11px;flex-shrink:0}
+.concept-btn.open .con-arr{transform:rotate(180deg)}
+.concept-body{display:none;padding:12px 14px;color:var(--text-muted);font-size:13px;line-height:1.75;border-top:1px solid var(--border)}.concept-body.open{display:block}
+.theory-block{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--review);border-radius:var(--radius-xs);padding:14px;margin-bottom:10px}
+.theory-block h4{color:var(--review);font-size:12px;font-weight:700;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.05em}
+.theory-block p{color:var(--text-muted);font-size:13px;line-height:1.75}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.flashcard{perspective:1000px;height:148px;cursor:pointer}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform 0.45s;transform-style:preserve-3d}
+.flashcard.flipped .fc-inner{transform:rotateY(180deg)}
+.fc-front,.fc-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius-xs);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center;border:1px solid var(--memorize-border)}
+.fc-front{background:var(--memorize-bg)}.fc-lbl{font-size:10px;color:var(--memorize);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px}
+.fc-q{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}.fc-hint{font-size:10px;color:var(--text-dim);margin-top:7px}
+.fc-back{background:var(--surface2);transform:rotateY(180deg);border-color:var(--border)}.fc-a{font-size:13px;color:var(--text-muted);line-height:1.5}
+.dates-list{display:flex;flex-direction:column}
+.date-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}.date-row:last-child{border-bottom:none}
+.date-yr{min-width:86px;font-size:13px;font-weight:800;color:var(--recall);flex-shrink:0}
+.date-dot{width:7px;height:7px;border-radius:50%;background:var(--recall);flex-shrink:0;margin-top:6px}
+.date-ev{font-size:13px;font-weight:600}.date-det{font-size:12px;color:var(--text-muted);margin-top:2px}
+.pyq-item{background:var(--surface);border:1px solid var(--pyq-border);border-radius:var(--radius-xs);margin-bottom:10px;overflow:hidden}
+.pyq-hdr{padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.pyq-badge{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0}
+.pyq-yr{font-size:12px;font-weight:800;color:var(--pyq);background:var(--pyq-bg);border:1px solid var(--pyq-border);border-radius:var(--radius-xs);padding:2px 8px}
+.pyq-type{font-size:9px;color:var(--text-dim);text-align:center}
+.pyq-q{font-size:13px;font-weight:600;line-height:1.5;color:var(--text);flex:1}
+.pyq-btn{margin:0 14px 12px;padding:6px 13px;background:var(--pyq-bg);border:1px solid var(--pyq-border);color:var(--pyq);border-radius:var(--radius-xs);cursor:pointer;font-size:12px;font-weight:600;transition:all var(--tr);width:fit-content}
+.pyq-btn:hover{background:var(--pyq);color:white}
+.pyq-ans{display:none;padding:12px 14px;border-top:1px solid var(--pyq-border);font-size:13px;color:var(--text-muted);line-height:1.75;background:var(--surface2)}.pyq-ans.open{display:block}
+.bt-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xs);margin-bottom:9px;overflow:hidden}
+.bt-q{padding:12px 14px;font-size:13px;font-weight:600;display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.bt-num{min-width:24px;height:24px;border-radius:var(--radius-xs);background:var(--solve-bg);color:var(--solve);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;border:1px solid var(--solve-border)}
+.bt-btn{margin:0 14px 12px;padding:6px 13px;background:var(--solve-bg);border:1px solid var(--solve-border);color:var(--solve);border-radius:var(--radius-xs);cursor:pointer;font-size:12px;font-weight:600;transition:all var(--tr);width:fit-content}
+.bt-btn:hover{background:var(--solve);color:white}
+.bt-ans{display:none;padding:12px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);line-height:1.75;background:var(--surface2)}.bt-ans.open{display:block}
+.empty{text-align:center;padding:48px 20px;color:var(--text-dim)}.empty-icon{font-size:36px;margin-bottom:12px}
+.empty h3{font-size:15px;color:var(--text-muted);margin-bottom:6px;font-weight:700}.empty p{font-size:12px;line-height:1.6}
+
+/* ACCOUNT PAGE */
+.account-page{padding:18px;max-width:560px;margin:0 auto}
+.account-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.account-section h3{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--text)}
+.account-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.account-stat{text-align:center;padding:12px 8px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)}
+.account-stat-num{font-size:20px;font-weight:800}.account-stat-lbl{font-size:10px;color:var(--text-muted);margin-top:3px}
+.danger-zone{margin-top:8px;padding-top:16px;border-top:1px solid var(--border)}
+.danger-label{font-size:11px;color:var(--text-dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em}
+.danger-btn{padding:8px 16px;background:none;border:1px solid var(--recall-border);color:var(--recall);border-radius:var(--radius-xs);cursor:pointer;font-size:12px;font-weight:600;transition:all var(--tr)}
+.danger-btn:hover{background:var(--recall-bg)}
+.save-btn{padding:9px 20px;background:linear-gradient(135deg,#7C3AED,#2563EB);border:none;border-radius:var(--radius-xs);color:white;font-size:13px;font-weight:700;cursor:pointer;transition:opacity var(--tr)}
+.save-btn:hover{opacity:0.9}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#00000070;z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:360px}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.modal p{font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6}
+.modal-btns{display:flex;gap:10px;margin-top:16px}
+.modal-cancel{flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer}
+.modal-confirm{flex:1;padding:9px;background:var(--recall-bg);border:1px solid var(--recall-border);border-radius:var(--radius-xs);color:var(--flag);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr)}
+.modal-confirm:hover{background:var(--flag);color:white}
+.modal-confirm:disabled{opacity:0.4;cursor:not-allowed}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 18px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px #00000050}
+.toast.show{opacity:1}.toast.rev{border-color:var(--mastered);color:var(--mastered)}.toast.err{border-color:var(--flag);color:var(--flag)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@media(max-width:480px){nav{padding:0 10px}.page{padding:12px 10px}.fc-grid{grid-template-columns:1fr}.stage-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading" style="display:none">
+  <div style="text-align:center">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loading-text">Please wait...</div>
+  </div>
+</div>
+
+<!-- WELCOME SCREEN -->
+<div class="auth-screen" id="screen-welcome">
+  <div class="auth-logo">🎯</div>
+  <div class="auth-title">UPSC Study Portal</div>
+  <div class="auth-sub">Your complete revision & tracking system</div>
+  <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px">
+    <button class="btn-primary" onclick="showScreen('screen-login')" style="margin-top:0">Sign In</button>
+    <button class="btn-secondary" onclick="showScreen('screen-register')">Create Account</button>
+  </div>
+  <div style="margin-top:20px">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="wlb-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="wlb-hi" onclick="setLang('hi')">हिं</button>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER SCREEN -->
+<div class="auth-screen" id="screen-register" style="display:none">
+  <div class="auth-logo">✨</div>
+  <div class="auth-title">Create Account</div>
+  <div class="auth-sub">Set up your personal study profile</div>
+  <div class="auth-card">
+    <h2>Personal Info</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name *</label>
+        <input class="form-input" id="reg-fname" placeholder="Shivu" type="text">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name *</label>
+        <input class="form-input" id="reg-lname" placeholder="Sharma" type="text">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date of Birth *</label>
+      <input class="form-input" id="reg-dob" type="date">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Target Year *</label>
+        <select class="form-input" id="reg-year">
+          <option value="">Select</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Score</label>
+        <input class="form-input" id="reg-score" placeholder="Optional" type="number">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Optional Subject</label>
+      <select class="form-input" id="reg-optional">
+        <option value="">Select (Optional)</option>
+        <option>Agriculture</option><option>Anthropology</option><option>Botany</option>
+        <option>Chemistry</option><option>Civil Engineering</option><option>Commerce & Accountancy</option>
+        <option>Economics</option><option>Electrical Engineering</option><option>Geography</option>
+        <option>Geology</option><option>History</option><option>Law</option><option>Management</option>
+        <option>Mathematics</option><option>Mechanical Engineering</option><option>Medical Science</option>
+        <option>Philosophy</option><option>Physics</option><option>Political Science & IR</option>
+        <option>Psychology</option><option>Public Administration</option><option>Sociology</option>
+        <option>Statistics</option><option>Zoology</option><option>Hindi Literature</option>
+        <option>English Literature</option><option>Sanskrit</option><option>Other Literature</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Set 6-Digit Passkey *</label>
+        <input class="form-input" id="reg-pk-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••">
+        <div class="form-hint">Numbers only, 6 digits</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Passkey *</label>
+        <input class="form-input" id="reg-confirm-pk-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••">
+      </div>
+    </div>
+    <div class="form-error" id="reg-error"></div>
+    <button class="btn-primary" onclick="doRegister()">Create Account</button>
+    <div class="auth-switch">Already have an account? <span onclick="showScreen('screen-login')">Sign In</span></div>
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div class="auth-screen" id="screen-login" style="display:none">
+  <div class="auth-logo">🔐</div>
+  <div class="auth-title">Sign In</div>
+  <div class="auth-sub">Welcome back! Enter your details</div>
+  <div class="auth-card">
+    <h2>Your Details</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name *</label>
+        <input class="form-input" id="login-fname" placeholder="Shivu" type="text">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name *</label>
+        <input class="form-input" id="login-lname" placeholder="Sharma" type="text">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:8px">
+      <label class="form-label">6-Digit Passkey *</label>
+      <input class="form-input" id="login-pk-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••">
+    </div>
+    <div class="form-error" id="login-error"></div>
+    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="auth-switch">New here? <span onclick="showScreen('screen-register')">Create Account</span></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <nav>
+    <button class="nav-menu-btn" onclick="toggleMenu()">☰</button>
+    <button class="nav-back-btn" id="nav-back" onclick="goBack()">‹ Back</button>
+    <span class="nav-logo">🎯</span>
+    <div id="nav-c" style="flex:1;min-width:0"></div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="lb-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="lb-hi" onclick="setLang('hi')">हिं</button>
+    </div>
+  </nav>
+
+  <!-- SIDE MENU -->
+  <div class="side-overlay" id="side-overlay" onclick="toggleMenu()"></div>
+  <div class="side-menu" id="side-menu">
+    <div class="side-menu-header">
+      <div class="side-user-avatar" id="sm-avatar"></div>
+      <div class="side-user-name" id="sm-name"></div>
+      <div class="side-user-meta" id="sm-meta"></div>
+    </div>
+    <div class="side-menu-items">
+      <button class="side-item" onclick="navTo('home')"><span class="side-item-icon">🏠</span><span class="side-item-label" id="si-home">Home</span></button>
+      <div class="side-divider"></div>
+      <button class="side-item" onclick="navTo('account')"><span class="side-item-icon">👤</span><span class="side-item-label" id="si-account">My Account</span></button>
+      <button class="side-item" onclick="exportProg()"><span class="side-item-icon">⬇</span><span class="side-item-label" id="si-export">Export Progress</span></button>
+      <button class="side-item" onclick="document.getElementById('imp-f').click()"><span class="side-item-icon">⬆</span><span class="side-item-label" id="si-import">Import Progress</span></button>
+      <input type="file" id="imp-f" accept=".json" style="display:none" onchange="importProg(event)">
+    </div>
+    <div class="side-menu-footer">
+      <button class="side-signout-btn" onclick="signOut()">🚪 <span id="si-signout">Sign Out</span></button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="page active" id="pg-home">
+    <div class="welcome-bar">
+      <div class="welcome-avatar" id="home-avatar"></div>
+      <div>
+        <div class="welcome-name" id="home-welcome"></div>
+        <div class="welcome-meta" id="home-meta"></div>
+      </div>
+    </div>
+    <div class="metrics-bar">
+      <div class="metrics-title" id="opl">OVERALL PROGRESS</div>
+      <div class="metrics-grid">
+        <div class="mc"><div class="mc-num mn-pur" id="m-tot">0</div><div class="mc-lbl" id="ml-tot">Total</div></div>
+        <div class="mc"><div class="mc-num mn-gray" id="m-nt">0</div><div class="mc-lbl" id="ml-nt">Not Touched</div></div>
+        <div class="mc"><div class="mc-num mn-blue" id="m-seen">0</div><div class="mc-lbl" id="ml-seen">Seen</div></div>
+        <div class="mc"><div class="mc-num mn-grn" id="m-lrn">0</div><div class="mc-lbl" id="ml-lrn">Learned</div></div>
+        <div class="mc"><div class="mc-num mn-red" id="m-rev">0</div><div class="mc-lbl" id="ml-rev">Need Revision</div></div>
+        <div class="mc"><div class="mc-num mn-amb" id="m-flg">0</div><div class="mc-lbl" id="ml-flg">Flagged</div></div>
+      </div>
+    </div>
+    <div class="sec-lbl" id="ssl">SELECT STAGE</div>
+    <div class="stage-grid">
+      <div class="stage-card prelims" onclick="goStage('prelims')">
+        <div class="stage-badge">📋 2 Papers</div>
+        <h3 id="pre-t">Prelims</h3><p id="pre-d">GS Paper I & CSAT</p>
+        <div class="prog-bar"><div class="prog-fill" id="pre-f" style="width:0%"></div></div>
+        <div class="prog-lbl" id="pre-p">0% complete</div>
+      </div>
+      <div class="stage-card mains" onclick="goStage('mains')">
+        <div class="stage-badge">📝 9 Papers</div>
+        <h3 id="main-t">Mains</h3><p id="main-d">GS I–IV, Essay, Optional</p>
+        <div class="prog-bar"><div class="prog-fill" id="main-f" style="width:0%"></div></div>
+        <div class="prog-lbl" id="main-p">0% complete</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE -->
+  <div class="page" id="pg-stage">
+    <div class="pg-hdr"><h1 id="st-t"></h1><p id="st-d"></p></div>
+    <div class="sec-lbl" id="papers-lbl">PAPERS</div>
+    <div class="paper-grid" id="paper-grid"></div>
+  </div>
+
+  <!-- PAPER -->
+  <div class="page" id="pg-paper">
+    <div class="pg-hdr"><h1 id="pa-t"></h1><p id="pa-d"></p></div>
+    <div class="sec-lbl" id="topics-lbl">TOPICS</div>
+    <div class="topic-list" id="topic-list"></div>
+  </div>
+
+  <!-- TOPIC -->
+  <div class="page" id="pg-topic">
+    <div class="pg-hdr"><h1 id="tp-t"></h1><p id="tp-d"></p></div>
+    <div class="sec-lbl" id="chapters-lbl">CHAPTERS</div>
+    <div class="chapter-cards" id="chapter-cards"></div>
+  </div>
+
+  <!-- CHAPTER CONTENT -->
+  <div class="page" id="pg-chapter">
+    <div class="ch-hdr">
+      <h1 id="ch-t"></h1>
+      <div class="ch-bc" id="ch-bc"></div>
+      <div class="sec-metrics" id="sec-metrics"></div>
+      <div class="tag-row">
+        <span class="tag-lbl" id="mark-lbl">Mark:</span>
+        <button class="tag-btn" id="tb-flag" onclick="togTag('flag')">🚩 Flag</button>
+        <button class="tag-btn" id="tb-learned" onclick="togTag('learned')">✅ Learned</button>
+        <button class="tag-btn" id="tb-imp" onclick="togTag('imp')">⭐ Important</button>
+        <button class="tag-btn" id="tb-forgetting" onclick="togTag('forgetting')">💀 Forgetting</button>
+        <button class="tag-btn" id="tb-revision" onclick="togTag('revision')">🔁 Revise</button>
+      </div>
+      <div class="lv-txt" id="lv-txt"></div>
+    </div>
+    <div class="sec-tabs">
+      <button class="sec-tab active" data-s="concepts" onclick="switchSec('concepts')"><span id="st-con">🟣 Concepts</span></button>
+      <button class="sec-tab" data-s="theory" onclick="switchSec('theory')"><span id="st-thy">🟢 Theory</span></button>
+      <button class="sec-tab" data-s="facts" onclick="switchSec('facts')"><span id="st-fct">🧠 Facts</span></button>
+      <button class="sec-tab" data-s="dates" onclick="switchSec('dates')"><span id="st-dt">🔴 Dates</span></button>
+      <button class="sec-tab" data-s="pyqs" onclick="switchSec('pyqs')"><span id="st-pyq">🔵 PYQs</span></button>
+      <button class="sec-tab" data-s="brainteasers" onclick="switchSec('brainteasers')"><span id="st-bt">🟠 Brain Teasers</span></button>
+    </div>
+    <div class="sec-content active" id="sc-concepts"></div>
+    <div class="sec-content" id="sc-theory"></div>
+    <div class="sec-content" id="sc-facts"></div>
+    <div class="sec-content" id="sc-dates"></div>
+    <div class="sec-content" id="sc-pyqs"></div>
+    <div class="sec-content" id="sc-brainteasers"></div>
+  </div>
+
+  <!-- ACCOUNT PAGE -->
+  <div class="page" id="pg-account">
+    <div class="account-page">
+      <div class="pg-hdr"><h1 id="acc-title">My Account</h1><p id="acc-sub">Manage your profile and settings</p></div>
+      <div class="account-section">
+        <h3 id="acc-stats-title">Your Progress Stats</h3>
+        <div class="account-stat-grid">
+          <div class="account-stat"><div class="account-stat-num mn-pur" id="acc-total">0</div><div class="account-stat-lbl" id="acc-total-lbl">Total Chapters</div></div>
+          <div class="account-stat"><div class="account-stat-num mn-grn" id="acc-learned">0</div><div class="account-stat-lbl" id="acc-learned-lbl">Learned</div></div>
+          <div class="account-stat"><div class="account-stat-num mn-blue" id="acc-revisions">0</div><div class="account-stat-lbl" id="acc-rev-lbl">Total Revisions</div></div>
+        </div>
+      </div>
+      <div class="account-section">
+        <h3 id="acc-info-title">Personal Information</h3>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" id="acc-fname-lbl">First Name</label><input class="form-input" id="acc-fname" type="text"></div>
+          <div class="form-group"><label class="form-label" id="acc-lname-lbl">Last Name</label><input class="form-input" id="acc-lname" type="text"></div>
+        </div>
+        <div class="form-group"><label class="form-label" id="acc-dob-lbl">Date of Birth</label><input class="form-input" id="acc-dob" type="date"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" id="acc-year-lbl">Target Year</label>
+            <select class="form-input" id="acc-year"><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option></select>
+          </div>
+          <div class="form-group"><label class="form-label" id="acc-score-lbl">Last Score</label><input class="form-input" id="acc-score" type="number" placeholder="Optional"></div>
+        </div>
+        <div class="form-group"><label class="form-label" id="acc-opt-lbl">Optional Subject</label>
+          <select class="form-input" id="acc-optional">
+            <option value="">None Selected</option>
+            <option>Agriculture</option><option>Anthropology</option><option>Botany</option><option>Chemistry</option><option>Civil Engineering</option><option>Commerce & Accountancy</option><option>Economics</option><option>Electrical Engineering</option><option>Geography</option><option>Geology</option><option>History</option><option>Law</option><option>Management</option><option>Mathematics</option><option>Mechanical Engineering</option><option>Medical Science</option><option>Philosophy</option><option>Physics</option><option>Political Science & IR</option><option>Psychology</option><option>Public Administration</option><option>Sociology</option><option>Statistics</option><option>Zoology</option><option>Hindi Literature</option><option>English Literature</option><option>Sanskrit</option><option>Other Literature</option>
+          </select>
+        </div>
+        <button class="save-btn" onclick="saveProfile()" id="acc-save-btn">Save Changes</button>
+      </div>
+      <div class="account-section">
+        <h3 id="acc-passkey-title">Change Passkey</h3>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" id="acc-curr-pk-lbl">Current Passkey</label>
+            <input class="form-input" id="curr-pk-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••">
+          </div>
+          <div class="form-group"><label class="form-label" id="acc-new-pk-lbl">New Passkey</label>
+            <input class="form-input" id="new-pk-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••••">
+          </div>
+        </div>
+        <div class="form-error" id="pk-error"></div>
+        <button class="save-btn" style="margin-top:8px" onclick="changePasskey()">Update Passkey</button>
+      </div>
+      <!-- DANGER ZONE — hidden at bottom -->
+      <div class="account-section">
+        <div class="danger-zone">
+          <div class="danger-label" id="danger-lbl">⚠ Danger Zone</div>
+          <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px" id="danger-desc">This will permanently erase all your revision counts, tags, and tracked data.</p>
+          <button class="danger-btn" onclick="openResetModal()" id="danger-btn">Reset All Progress</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="modal-overlay" id="reset-modal">
+  <div class="modal">
+    <h3>⚠️ Reset All Progress?</h3>
+    <p id="modal-desc">This will permanently delete all your revision counts, tags, and tracked data. This cannot be undone.</p>
+    <div class="form-group">
+      <label class="form-label">Type <strong>RESET</strong> to confirm</label>
+      <input class="form-input" id="reset-confirm-input" placeholder="RESET" oninput="checkResetInput()">
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeResetModal()">Cancel</button>
+      <button class="modal-confirm" id="reset-confirm-btn" onclick="doReset()" disabled>Reset — I'm Sure</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ══ CONFIG ══
+const API='https://script.google.com/macros/s/AKfycbyByvCVcjHnev5S0yvmAvGH8L7yas128cFgUc-QG1HlLF0BAVsfZtkKwluenKxvhWeB/exec';
+
+// ══ SYLLABUS ══
+const SYL={
+  prelims:{en:{name:'Prelims',desc:'Screening Test — Objective Type'},hi:{name:'प्रारंभिक परीक्षा',desc:'स्क्रीनिंग टेस्ट'},
+    papers:[
+      {id:'pre-gs1',icon:'📚',en:{name:'GS Paper I',desc:'History, Geography, Polity, Economy, Environment, Science'},hi:{name:'सामान्य अध्ययन I',desc:'इतिहास, भूगोल, राजव्यवस्था, अर्थव्यवस्था'},
+        topics:[
+          {id:'t-preh',icon:'🏺',en:{name:'History & National Movement',desc:'Ancient, Medieval, Modern & Freedom Struggle'},hi:{name:'इतिहास एवं राष्ट्रीय आंदोलन',desc:'प्राचीन, मध्यकालीन, आधुनिक'},chapters:[{id:'preh-ancient',en:'Ancient India',hi:'प्राचीन भारत'},{id:'preh-medieval',en:'Medieval India',hi:'मध्यकालीन भारत'},{id:'preh-modern',en:'Modern India (1757–1947)',hi:'आधुनिक भारत'},{id:'preh-freedom',en:'Indian National Movement',hi:'भारतीय राष्ट्रीय आंदोलन'},{id:'preh-art',en:'Art & Culture',hi:'कला एवं संस्कृति'}]},
+          {id:'t-pregeo',icon:'🌍',en:{name:'Geography',desc:'Physical, Social & Economic Geography'},hi:{name:'भूगोल',desc:'भौतिक, सामाजिक एवं आर्थिक भूगोल'},chapters:[{id:'geo-physical',en:'Physical Geography of India',hi:'भारत का भौतिक भूगोल'},{id:'geo-climate',en:'Climate, Rivers & Drainage',hi:'जलवायु, नदियां'},{id:'geo-world',en:'World Physical Geography',hi:'विश्व भौतिक भूगोल'},{id:'geo-economic',en:'Economic Geography',hi:'आर्थिक भूगोल'}]},
+          {id:'t-prepol',icon:'⚖️',en:{name:'Polity & Governance',desc:'Constitution, Political System, Panchayati Raj'},hi:{name:'राजव्यवस्था एवं शासन',desc:'संविधान, राजनीतिक प्रणाली'},chapters:[{id:'pol-const',en:'Making of the Constitution',hi:'संविधान का निर्माण'},{id:'pol-preamble',en:'Preamble & Key Features',hi:'उद्देशिका एवं विशेषताएं'},{id:'pol-fr',en:'Fundamental Rights & Duties',hi:'मूल अधिकार एवं कर्तव्य'},{id:'pol-dpsp',en:'DPSP & Amendments',hi:'DPSP एवं संशोधन'},{id:'pol-parliament',en:'Parliament & Legislatures',hi:'संसद'},{id:'pol-executive',en:'Executive & Judiciary',hi:'कार्यपालिका'},{id:'pol-local',en:'Local Govt & Panchayati Raj',hi:'स्थानीय सरकार'}]},
+          {id:'t-preeco',icon:'📈',en:{name:'Economy & Social Development',desc:'Sustainable Development, Poverty'},hi:{name:'अर्थव्यवस्था',desc:'सतत विकास, गरीबी'},chapters:[{id:'eco-basics',en:'Indian Economy Basics',hi:'अर्थव्यवस्था मूल अवधारणाएं'},{id:'eco-poverty',en:'Poverty & Employment',hi:'गरीबी एवं रोजगार'},{id:'eco-social',en:'Social Sector Initiatives',hi:'सामाजिक क्षेत्र'}]},
+          {id:'t-preenv',icon:'🌿',en:{name:'Environment & Ecology',desc:'Biodiversity, Climate Change'},hi:{name:'पर्यावरण',desc:'जैव विविधता, जलवायु'},chapters:[{id:'env-ecology',en:'Ecology Basics',hi:'पारिस्थितिकी'},{id:'env-biodiversity',en:'Biodiversity & Conservation',hi:'जैव विविधता'},{id:'env-climate',en:'Climate Change',hi:'जलवायु परिवर्तन'},{id:'env-pollution',en:'Environmental Pollution',hi:'प्रदूषण'}]},
+          {id:'t-presci',icon:'🔬',en:{name:'General Science',desc:'Physics, Chemistry, Biology'},hi:{name:'सामान्य विज्ञान',desc:'भौतिकी, रसायन, जीव विज्ञान'},chapters:[{id:'sci-physics',en:'Physics & Space',hi:'भौतिकी'},{id:'sci-chemistry',en:'Chemistry',hi:'रसायन'},{id:'sci-biology',en:'Biology',hi:'जीव विज्ञान'},{id:'sci-tech',en:'Science & Technology',hi:'विज्ञान एवं प्रौद्योगिकी'}]},
+          {id:'t-precurr',icon:'📰',en:{name:'Current Affairs',desc:'National & International Events'},hi:{name:'समसामयिक घटनाएं',desc:'राष्ट्रीय एवं अंतरराष्ट्रीय'},chapters:[{id:'curr-national',en:'National Current Affairs',hi:'राष्ट्रीय समसामयिकी'},{id:'curr-international',en:'International Affairs',hi:'अंतरराष्ट्रीय'},{id:'curr-govt',en:'Government Schemes',hi:'सरकारी योजनाएं'}]},
+        ]},
+      {id:'pre-csat',icon:'🧮',en:{name:'CSAT (Paper II)',desc:'Qualifying — 33% minimum'},hi:{name:'CSAT (पेपर II)',desc:'अर्हता पेपर'},
+        topics:[
+          {id:'t-ccomp',icon:'📖',en:{name:'Comprehension',desc:'Reading comprehension'},hi:{name:'अवबोध',desc:'अनुच्छेद आधारित'},chapters:[{id:'csat-comp',en:'Comprehension Passages',hi:'अवबोध अनुच्छेद'}]},
+          {id:'t-creason',icon:'🧠',en:{name:'Reasoning & Analytical Ability',desc:'Logical reasoning'},hi:{name:'तार्किक विवेचन',desc:'तर्क एवं विश्लेषण'},chapters:[{id:'csat-r1',en:'Logical Reasoning',hi:'तार्किक विवेचन'},{id:'csat-r2',en:'Analytical Ability',hi:'विश्लेषणात्मक क्षमता'},{id:'csat-r3',en:'Decision Making',hi:'निर्णय लेना'}]},
+          {id:'t-cmath',icon:'🔢',en:{name:'Numeracy & Data Interpretation',desc:'Numbers, data, charts'},hi:{name:'संख्यात्मकता',desc:'संख्या, डेटा, चार्ट'},chapters:[{id:'csat-m1',en:'Basic Numeracy',hi:'सामान्य संख्यात्मकता'},{id:'csat-m2',en:'Data Interpretation',hi:'आंकड़ों की व्याख्या'}]},
+        ]},
+    ]},
+  mains:{en:{name:'Mains',desc:'Written Examination — 9 Papers'},hi:{name:'मुख्य परीक्षा',desc:'लिखित परीक्षा — 9 पेपर'},
+    papers:[
+      {id:'m-gs1',icon:'🏛️',en:{name:'GS Paper I',desc:'Heritage & Culture, History, Geography & Society'},hi:{name:'सामान्य अध्ययन I',desc:'विरासत, इतिहास, भूगोल एवं समाज'},
+        topics:[
+          {id:'t-m1culture',icon:'🎨',en:{name:'Indian Art & Culture',desc:'Art forms, Literature & Architecture'},hi:{name:'भारतीय कला एवं संस्कृति',desc:'कला, साहित्य एवं वास्तुकला'},chapters:[{id:'m1c-ancient',en:'Ancient Art & Architecture',hi:'प्राचीन कला'},{id:'m1c-medieval',en:'Medieval Art & Architecture',hi:'मध्यकालीन कला'},{id:'m1c-lit',en:'Indian Literature',hi:'भारतीय साहित्य'},{id:'m1c-perf',en:'Performing Arts & Music',hi:'प्रदर्शन कला'}]},
+          {id:'t-m1hist',icon:'📜',en:{name:'Modern Indian History',desc:'1750 to present'},hi:{name:'आधुनिक भारतीय इतिहास',desc:'1750 से वर्तमान'},chapters:[{id:'m1mh-british',en:'British Expansion & Policies',hi:'ब्रिटिश विस्तार'},{id:'m1mh-reform',en:'Social & Religious Reform',hi:'सामाजिक सुधार'},{id:'m1mh-freedom',en:'Freedom Struggle',hi:'स्वतंत्रता संग्राम'},{id:'m1mh-partition',en:'Partition & Post-Independence',hi:'विभाजन'}]},
+          {id:'t-m1world',icon:'🌐',en:{name:'World History',desc:'18th century onwards'},hi:{name:'विश्व इतिहास',desc:'18वीं सदी से'},chapters:[{id:'m1wh-industrial',en:'Industrial Revolution',hi:'औद्योगिक क्रांति'},{id:'m1wh-wars',en:'World War I & II',hi:'विश्व युद्ध'},{id:'m1wh-cold',en:'Cold War & Decolonization',hi:'शीत युद्ध'},{id:'m1wh-phil',en:'Political Philosophies',hi:'राजनीतिक दर्शन'}]},
+          {id:'t-m1soc',icon:'👥',en:{name:'Indian Society & Geography',desc:'Society, Diversity, Globalization'},hi:{name:'भारतीय समाज एवं भूगोल',desc:'समाज, विविधता'},chapters:[{id:'m1s-society',en:'Indian Society & Diversity',hi:'भारतीय समाज'},{id:'m1s-women',en:'Women & Population Issues',hi:'महिला एवं जनसंख्या'},{id:'m1s-global',en:'Globalization & Empowerment',hi:'वैश्वीकरण'},{id:'m1s-geo',en:'Natural Resources & Geophysical',hi:'प्राकृतिक संसाधन'}]},
+        ]},
+      {id:'m-gs2',icon:'⚖️',en:{name:'GS Paper II',desc:'Governance, Constitution, Polity, Social Justice & IR'},hi:{name:'सामान्य अध्ययन II',desc:'शासन, संविधान, राजव्यवस्था'},
+        topics:[
+          {id:'t-m2polity',icon:'🏛️',en:{name:'Indian Polity & Constitution',desc:'Constitution, Parliament, Executive, Judiciary'},hi:{name:'भारतीय राजव्यवस्था एवं संविधान',desc:'संविधान, संसद, कार्यपालिका'},chapters:[{id:'m2p-making',en:'Making of the Constitution',hi:'संविधान का निर्माण'},{id:'m2p-features',en:'Salient Features & Preamble',hi:'प्रमुख विशेषताएं'},{id:'m2p-federal',en:'Federal Structure & Centre-State',hi:'संघीय संरचना'},{id:'m2p-separation',en:'Separation of Powers',hi:'शक्तियों का पृथक्करण'},{id:'m2p-comparison',en:'Comparison with Other Constitutions',hi:'तुलना'},{id:'m2p-parliament',en:'Parliament & State Legislatures',hi:'संसद'},{id:'m2p-executive',en:'Executive — President, PM',hi:'कार्यपालिका'},{id:'m2p-judiciary',en:'Judiciary & Judicial Review',hi:'न्यायपालिका'},{id:'m2p-rpa',en:"Representation of People's Act",hi:'जनप्रतिनिधित्व'},{id:'m2p-constbodies',en:'Constitutional Bodies',hi:'संवैधानिक निकाय'},{id:'m2p-statbodies',en:'Statutory & Quasi-Judicial Bodies',hi:'सांविधिक निकाय'}]},
+          {id:'t-m2gov',icon:'🏢',en:{name:'Governance & Social Justice',desc:'E-Governance, Welfare, NGOs, Civil Services'},hi:{name:'शासन एवं सामाजिक न्याय',desc:'ई-शासन, कल्याण'},chapters:[{id:'m2g-gov',en:'Governance & Transparency',hi:'शासन'},{id:'m2g-egov',en:'E-Governance',hi:'ई-शासन'},{id:'m2g-welfare',en:'Welfare Schemes',hi:'कल्याण योजनाएं'},{id:'m2g-ngo',en:'NGOs & SHGs',hi:'NGO, SHG'},{id:'m2g-civil',en:'Civil Services in Democracy',hi:'सिविल सेवाएं'},{id:'m2g-poverty',en:'Poverty & Hunger',hi:'गरीबी'}]},
+          {id:'t-m2ir',icon:'🌐',en:{name:'International Relations',desc:'Neighbourhood, Bilateral, Multilateral'},hi:{name:'अंतरराष्ट्रीय संबंध',desc:'पड़ोस, द्विपक्षीय'},chapters:[{id:'m2ir-neighbour',en:'India & Neighbourhood',hi:'पड़ोसी देश'},{id:'m2ir-bilateral',en:'Bilateral Relations',hi:'द्विपक्षीय'},{id:'m2ir-groupings',en:'Regional & Global Groupings',hi:'समूह'},{id:'m2ir-institutions',en:'International Institutions',hi:'अंतरराष्ट्रीय संस्थाएं'},{id:'m2ir-diaspora',en:'Indian Diaspora',hi:'प्रवासी भारतीय'}]},
+        ]},
+      {id:'m-gs3',icon:'🔬',en:{name:'GS Paper III',desc:'Economy, Technology, Environment, Security'},hi:{name:'सामान्य अध्ययन III',desc:'अर्थव्यवस्था, प्रौद्योगिकी, सुरक्षा'},
+        topics:[
+          {id:'t-m3eco',icon:'📈',en:{name:'Indian Economy',desc:'Planning, Agriculture, Infrastructure'},hi:{name:'भारतीय अर्थव्यवस्था',desc:'नियोजन, कृषि'},chapters:[{id:'m3e-plan',en:'Planning & Economic Growth',hi:'नियोजन'},{id:'m3e-inclusive',en:'Inclusive Growth',hi:'समावेशी विकास'},{id:'m3e-budget',en:'Government Budgeting',hi:'बजट'},{id:'m3e-agri',en:'Agriculture — Crops, MSP',hi:'कृषि'},{id:'m3e-food',en:'Food Processing & PDS',hi:'खाद्य प्रसंस्करण'},{id:'m3e-land',en:'Land Reforms',hi:'भूमि सुधार'},{id:'m3e-liberal',en:'Liberalization & Industrial Policy',hi:'उदारीकरण'},{id:'m3e-infra',en:'Infrastructure',hi:'बुनियादी ढांचा'},{id:'m3e-invest',en:'Investment Models',hi:'निवेश'}]},
+          {id:'t-m3sci',icon:'🚀',en:{name:'Science, Technology & Environment',desc:'S&T, IT, Space, Biotech, Environment'},hi:{name:'विज्ञान एवं पर्यावरण',desc:'S&T, IT, अंतरिक्ष'},chapters:[{id:'m3s-scitech',en:'Science & Technology',hi:'विज्ञान'},{id:'m3s-space',en:'IT, Space & Robotics',hi:'IT, अंतरिक्ष'},{id:'m3s-biotech',en:'Biotechnology & Nano',hi:'जैव-प्रौद्योगिकी'},{id:'m3s-ipr',en:'Intellectual Property Rights',hi:'बौद्धिक संपदा'},{id:'m3s-env',en:'Environment & Conservation',hi:'पर्यावरण'}]},
+          {id:'t-m3sec',icon:'🛡️',en:{name:'Security & Disaster Management',desc:'Internal Security, Disaster, Cyber'},hi:{name:'सुरक्षा एवं आपदा',desc:'आंतरिक सुरक्षा, आपदा'},chapters:[{id:'m3sec-disaster',en:'Disaster Management',hi:'आपदा प्रबंधन'},{id:'m3sec-internal',en:'Internal Security',hi:'आंतरिक सुरक्षा'},{id:'m3sec-cyber',en:'Cyber Security',hi:'साइबर सुरक्षा'},{id:'m3sec-border',en:'Border & Organized Crime',hi:'सीमा सुरक्षा'},{id:'m3sec-forces',en:'Security Forces',hi:'सुरक्षा बल'}]},
+        ]},
+      {id:'m-gs4',icon:'🧭',en:{name:'GS Paper IV — Ethics',desc:'Ethics, Integrity & Aptitude'},hi:{name:'सामान्य अध्ययन IV',desc:'नीतिशास्त्र, सत्यनिष्ठा'},
+        topics:[
+          {id:'t-m4eth',icon:'⚖️',en:{name:'Ethics & Human Values',desc:'Ethics, Attitude, EI, Moral Thinkers'},hi:{name:'नीतिशास्त्र',desc:'नीतिशास्त्र, अभिवृत्ति'},chapters:[{id:'m4e-basics',en:'Ethics & Human Interface',hi:'नीतिशास्त्र'},{id:'m4e-attitude',en:'Attitude',hi:'अभिवृत्ति'},{id:'m4e-aptitude',en:'Aptitude & Civil Service Values',hi:'अभिक्षमता'},{id:'m4e-ei',en:'Emotional Intelligence',hi:'भावनात्मक बुद्धिमत्ता'},{id:'m4e-thinkers',en:'Moral Thinkers',hi:'नैतिक विचारक'}]},
+          {id:'t-m4gov',icon:'🏛️',en:{name:'Ethics in Governance',desc:'Public Administration, Probity, Case Studies'},hi:{name:'शासन में नीतिशास्त्र',desc:'सार्वजनिक प्रशासन'},chapters:[{id:'m4g-pubadmin',en:'Ethics in Public Administration',hi:'सार्वजनिक प्रशासन'},{id:'m4g-probity',en:'Probity in Governance',hi:'सत्यनिष्ठा'},{id:'m4g-cases',en:'Case Studies',hi:'केस स्टडी'}]},
+        ]},
+      {id:'m-essay',icon:'✍️',en:{name:'Essay Paper',desc:'250 Marks — Two Essays'},hi:{name:'निबंध पेपर',desc:'250 अंक'},topics:[
+        {id:'t-essay',icon:'📝',en:{name:'Essay Topics & Practice',desc:'All major essay themes'},hi:{name:'निबंध विषय',desc:'प्रमुख निबंध विषय'},chapters:[{id:'es-society',en:'Society & Social Issues',hi:'समाज'},{id:'es-governance',en:'Governance & Democracy',hi:'शासन'},{id:'es-economy',en:'Economy & Development',hi:'अर्थव्यवस्था'},{id:'es-philosophy',en:'Philosophy & Ethics',hi:'दर्शन'},{id:'es-env',en:'Environment & Technology',hi:'पर्यावरण'},{id:'es-ir',en:'International Relations',hi:'अंतरराष्ट्रीय'}]},
+      ]},
+      {id:'m-optional',icon:'📖',en:{name:'Optional Subject',desc:'500 Marks — Paper I & II'},hi:{name:'वैकल्पिक विषय',desc:'500 अंक'},topics:[
+        {id:'t-opt',icon:'📚',en:{name:'Optional Subject',desc:'Select your optional'},hi:{name:'वैकल्पिक विषय',desc:'अपना विषय चुनें'},chapters:[{id:'opt-tbd',en:'Optional (Not Selected Yet)',hi:'वैकल्पिक (अभी चयनित नहीं)'}]},
+      ]},
+    ]}
+};
+
+// ══ NOTES ══
+const NOTES={
+  'm2p-making':{
+    en:{counts:{concepts:5,theory:2,facts:6,dates:11,pyqs:3,brainteasers:3},
+      concepts:[
+        {title:'Constituent Assembly',detail:'Body that drafted the Indian Constitution. Established under Cabinet Mission Plan (1946). Total 389 members (reduced to 299 after partition). First meeting: Dec 9, 1946. Dr. Sachidananda Sinha — Temporary President. Dr. Rajendra Prasad — Permanent President.'},
+        {title:'Basic Structure Doctrine',detail:'Kesavananda Bharati v. State of Kerala (1973). Parliament cannot amend the basic features of the Constitution. Key features: Supremacy of Constitution, Republican & Democratic form, Secular character, Separation of Powers, Federal character, Judicial Review, Free Elections.'},
+        {title:'Preamble',detail:'Soul of the Constitution. Amended once by 42nd Amendment (1976) — "Socialist", "Secular", "Integrity" added. Not justiciable but used to interpret ambiguous provisions. Nehru called it the "key to the Constitution."'},
+        {title:'Sources of the Constitution',detail:'UK: Parliamentary system, Rule of Law. USA: Fundamental Rights, Judicial Review. Ireland: DPSP. Canada: Federal with strong centre. Australia: Concurrent List, Joint Sitting. USSR: Fundamental Duties, Five Year Plans. Germany: Emergency provisions.'},
+        {title:'12 Schedules',detail:'Schedule 1: States & UTs. Schedule 2: Salaries. Schedule 3: Oaths. Schedule 7: Union/State/Concurrent Lists. Schedule 8: 22 Languages. Schedule 9: Land Reform Acts. Schedule 10: Anti-defection. Schedule 11: Panchayat (29). Schedule 12: Municipality (18).'},
+      ],
+      theory:[
+        {title:'Historical Underpinnings',content:'Demand first made by M.N. Roy in 1934. INC officially demanded it in 1935. Cabinet Mission Plan (1946) conceded. Assembly took 2 years, 11 months, 18 days. 11 sessions held. Total cost: ₹64 lakh. Dr. B.N. Rau was Constitutional Adviser.'},
+        {title:'Key Committees',content:'Drafting Committee — Dr. B.R. Ambedkar, 7 members. Union Powers Committee — Nehru. Union Constitution Committee — Nehru. Provincial Constitution Committee — Sardar Patel. Committee on Fundamental Rights — Sardar Patel. Steering Committee — Dr. Rajendra Prasad.'},
+      ],
+      facts:[
+        {q:'When was the Constitution adopted?',a:'November 26, 1949 — Constitution Day (Samvidhan Divas)'},
+        {q:'When did Constitution come into effect?',a:'January 26, 1950 — Republic Day'},
+        {q:'Who chaired the Drafting Committee?',a:'Dr. B.R. Ambedkar — "Father of the Indian Constitution"'},
+        {q:'Original Articles, Schedules & Parts?',a:'395 Articles, 8 Schedules, 22 Parts. Currently: 448 Articles, 12 Schedules, 25 Parts'},
+        {q:"World's longest constitution?",a:"India — world's longest written constitution for a sovereign nation"},
+        {q:'"Preamble is soul of Constitution" — who said?',a:'Sir Alladi Krishnaswami Ayyar'},
+      ],
+      dates:[
+        {year:'1934',event:'M.N. Roy demands Constituent Assembly',detail:'First demand for a body to frame India\'s constitution'},
+        {year:'1940',event:'August Offer',detail:'British acknowledged need for Indians to frame own constitution'},
+        {year:'1942',event:'Cripps Mission',detail:'Proposed Constituent Assembly after WWII — rejected'},
+        {year:'May 1946',event:'Cabinet Mission Plan',detail:'Actual framework for Constituent Assembly established'},
+        {year:'9 Dec 1946',event:'First meeting of Constituent Assembly',detail:'Dr. Sachidananda Sinha — Temporary President'},
+        {year:'11 Dec 1946',event:'Dr. Rajendra Prasad elected',detail:'Permanent President of Constituent Assembly'},
+        {year:'22 Jan 1947',event:'Objectives Resolution passed',detail:'Moved by Nehru — basis of the Preamble'},
+        {year:'29 Aug 1947',event:'Drafting Committee constituted',detail:'Dr. B.R. Ambedkar as Chairman'},
+        {year:'4 Nov 1948',event:'Draft Constitution introduced',detail:'First reading began in the Assembly'},
+        {year:'26 Nov 1949',event:'Constitution adopted',detail:'Constitution Day — 284 members signed'},
+        {year:'26 Jan 1950',event:'Constitution came into force',detail:'Republic Day — India became sovereign democratic republic'},
+      ],
+      pyqs:[
+        {year:'2013',type:'Mains GS II',q:'The Indian Constitution is both federal and unitary in nature. Critically analyse.',a:'Federal: dual government, written constitution, division of powers, independent judiciary. Unitary: strong centre, single constitution, emergency provisions, All India Services. K.C. Wheare calls it "quasi-federal." Conclusion: "An indestructible union of destructible states" (Dr. Ambedkar).'},
+        {year:'2015',type:'Mains GS II',q:'Discuss the significance of the 42nd Constitutional Amendment. Was it a transgression of the Basic Structure?',a:'42nd Amendment (1976) amended 59 provisions. Added Socialist, Secular, Integrity; Fundamental Duties; DPSP override FR. Challenged in Minerva Mills (1980): SC struck down unlimited amending power. Conclusion: Politically sweeping but partially unconstitutional.'},
+        {year:'2019',type:'Prelims',q:'Constituent Assembly: 1. Not directly elected. 2. Established under Cabinet Mission Plan. Correct statements?',a:'Both 1 and 2. Members elected indirectly by provincial assemblies. Established under Cabinet Mission Plan 1946. Originally 389 members; reduced to 299 after partition.'},
+      ],
+      brainteasers:[
+        {q:"The Constituent Assembly was not directly elected. How was it formed, and why doesn't this undermine the Constitution's legitimacy?",a:'Members elected by Provincial Legislative Assemblies via proportional representation. Legitimacy: indirect democracy — elected by elected legislators; diversity across regions; 3 years of debate with 7,635 amendments proposed; people\'s consent via 1952 elections.'},
+        {q:'If Basic Structure cannot be amended, does Parliament have unlimited sovereignty in India?',a:'Limited sovereignty. India follows "constitutional sovereignty" not "parliamentary sovereignty." Post-Kesavananda: Parliament cannot destroy Constitutional identity — cannot alter judicial independence, federalism, fundamental rights essence, secularism.'},
+        {q:'The 42nd Amendment is called the "Mini Constitution." Why? Was it constitutionally valid?',a:'Amended 59 provisions simultaneously. Added Fundamental Duties, made DPSP override FR, curtailed judicial review. Minerva Mills (1980) struck down unlimited amending power clauses. Politically sweeping; legally partially invalidated.'},
+      ]
+    },
+    hi:{counts:{concepts:5,theory:2,facts:6,dates:9,pyqs:2,brainteasers:2},
+      concepts:[
+        {title:'संविधान सभा',detail:'कैबिनेट मिशन योजना (1946) के तहत स्थापित। कुल 389 सदस्य (विभाजन के बाद 299)। 9 दिसंबर 1946 — प्रथम बैठक। डॉ. सच्चिदानंद सिन्हा — अस्थायी अध्यक्ष। डॉ. राजेंद्र प्रसाद — स्थायी अध्यक्ष।'},
+        {title:'मूल संरचना सिद्धांत',detail:'केशवानंद भारती बनाम केरल राज्य (1973)। संसद मूल विशेषताओं में संशोधन नहीं कर सकती। विशेषताएं: संविधान की सर्वोच्चता, धर्मनिरपेक्षता, शक्तियों का पृथक्करण, संघीय चरित्र।'},
+        {title:'उद्देशिका',detail:'संविधान की आत्मा। 42वें संशोधन (1976) द्वारा "समाजवादी", "धर्मनिरपेक्ष", "अखंडता" जोड़े गए। न्यायोचित नहीं — किंतु व्याख्या में उपयोगी।'},
+        {title:'संविधान के स्रोत',detail:'ब्रिटेन: संसदीय प्रणाली। अमेरिका: मूल अधिकार, न्यायिक समीक्षा। आयरलैंड: DPSP। कनाडा: शक्तिशाली केंद्र। ऑस्ट्रेलिया: समवर्ती सूची। USSR: मूल कर्तव्य।'},
+        {title:'12 अनुसूचियां',detail:'अनुसूची 1: राज्य। अनुसूची 7: तीन सूचियां। अनुसूची 8: 22 भाषाएं। अनुसूची 9: भूमि सुधार। अनुसूची 10: दल-बदल विरोधी। अनुसूची 11: पंचायत (29)। अनुसूची 12: नगरपालिका (18)।'},
+      ],
+      theory:[
+        {title:'ऐतिहासिक पृष्ठभूमि',content:'1934 में M.N. Roy की पहली मांग। 1935 में INC की आधिकारिक मांग। 1946 कैबिनेट मिशन योजना ने मानी। 2 वर्ष, 11 माह, 18 दिन में पूर्ण। 11 सत्र। ₹64 लाख कुल लागत। डॉ. बी.एन. राव — संवैधानिक सलाहकार।'},
+        {title:'प्रमुख समितियां',content:'प्रारूप समिति — डॉ. अंबेडकर, 7 सदस्य। संघ शक्ति समिति — नेहरू। प्रांतीय संविधान समिति — सरदार पटेल। मूल अधिकार समिति — सरदार पटेल। संचालन समिति — डॉ. राजेंद्र प्रसाद।'},
+      ],
+      facts:[
+        {q:'संविधान कब अपनाया गया?',a:'26 नवंबर 1949 — संविधान दिवस'},
+        {q:'संविधान कब लागू हुआ?',a:'26 जनवरी 1950 — गणतंत्र दिवस'},
+        {q:'प्रारूप समिति के अध्यक्ष?',a:'डॉ. बी.आर. अंबेडकर — "भारतीय संविधान के पिता"'},
+        {q:'मूल अनुच्छेद?',a:'395 अनुच्छेद, 8 अनुसूचियां, 22 भाग। वर्तमान: 448, 12, 25'},
+        {q:'विश्व का सबसे लंबा संविधान?',a:'भारत — सबसे लंबा लिखित संविधान'},
+        {q:'"प्रस्तावना संविधान की आत्मा है" — किसने कहा?',a:'सर अल्लादी कृष्णस्वामी अय्यर'},
+      ],
+      dates:[
+        {year:'1934',event:'M.N. Roy की मांग',detail:'संविधान सभा की पहली मांग'},
+        {year:'मई 1946',event:'कैबिनेट मिशन योजना',detail:'संविधान सभा का ढांचा'},
+        {year:'9 दिसंबर 1946',event:'पहली बैठक',detail:'डॉ. सच्चिदानंद सिन्हा — अस्थायी अध्यक्ष'},
+        {year:'22 जनवरी 1947',event:'उद्देश्य प्रस्ताव',detail:'नेहरू द्वारा — प्रस्तावना का आधार'},
+        {year:'29 अगस्त 1947',event:'प्रारूप समिति',detail:'डॉ. अंबेडकर — अध्यक्ष'},
+        {year:'26 नवंबर 1949',event:'संविधान अपनाया',detail:'284 सदस्यों ने हस्ताक्षर किए'},
+        {year:'26 जनवरी 1950',event:'संविधान लागू',detail:'भारत संप्रभु गणराज्य बना'},
+      ],
+      pyqs:[
+        {year:'2013',type:'Mains GS II',q:'भारतीय संविधान की प्रकृति संघीय एवं एकात्मक दोनों है। समीक्षा करें।',a:'संघीय: दोहरी सरकार, लिखित संविधान, शक्तियों का विभाजन। एकात्मक: शक्तिशाली केंद्र, एकल संविधान, आपातकालीन प्रावधान। K.C. Wheare: "अर्ध-संघीय"। निष्कर्ष: "अविनाशी संघ में विनाशनीय राज्य"।'},
+        {year:'2019',type:'Prelims',q:'संविधान सभा: 1. प्रत्यक्ष निर्वाचित नहीं। 2. कैबिनेट मिशन योजना के तहत। सही?',a:'दोनों 1 और 2 सही। अप्रत्यक्ष चुनाव — प्रांतीय विधान सभाओं द्वारा। 1946 कैबिनेट मिशन योजना के तहत स्थापित।'},
+      ],
+      brainteasers:[
+        {q:'संविधान सभा की वैधता पर प्रश्न क्यों नहीं?',a:'अप्रत्यक्ष लोकतंत्र, क्षेत्रीय विविधता, 3 वर्ष की बहस, 7,635 संशोधन प्रस्ताव, 1952 चुनावों से जनसहमति।'},
+        {q:'42वें संशोधन को "लघु संविधान" क्यों कहते हैं?',a:'59 प्रावधानों में एक साथ संशोधन। मिनर्वा मिल्स (1980) में SC ने असीमित संशोधन शक्ति रद्द की।'},
+      ]
+    }
+  }
+};
+
+// ══ STATE ══
+let lang=localStorage.getItem('upsc-lang')||'en';
+let currentUser=null;
+let curStage=null,curPaper=null,curTopic=null,curChapter=null;
+let secTimers={},activeSec=null,progress={};
+const REV_THRESH=120;
+const SMETA=[
+  {id:'concepts',icon:'🟣',cls:'understand',en:'Concepts',hi:'अवधारणाएं'},
+  {id:'theory',icon:'🟢',cls:'review',en:'Theory',hi:'सिद्धांत'},
+  {id:'facts',icon:'🧠',cls:'memorize',en:'Facts',hi:'तथ्य'},
+  {id:'dates',icon:'🔴',cls:'recall',en:'Dates',hi:'तिथियां'},
+  {id:'pyqs',icon:'🔵',cls:'pyq',en:'PYQs',hi:'PYQ'},
+  {id:'brainteasers',icon:'🟠',cls:'solve',en:'Brain Teasers',hi:'ब्रेन टीज़र'},
+];
+const TX={
+  en:{title:'UPSC Study OS',overall:'OVERALL PROGRESS',total:'Total',nt:'Not Touched',seen:'Seen',learned:'Learned',needrev:'Need Revision',flagged:'Flagged',selectStage:'SELECT STAGE',papers:'PAPERS',topics:'TOPICS',chapters:'CHAPTERS',noNotes:'Notes not added',lv:'Last visited:',notYet:'Not visited yet',mark:'Mark:',tapFlip:'Tap to flip',reveal:'Reveal Answer',complete:'% complete',revs:'rev',emptyT:'Notes not added yet',emptyD:'Create notes with Claude → get JSON → paste here to activate.',saving:'Saving...'},
+  hi:{title:'UPSC अध्ययन OS',overall:'समग्र प्रगति',total:'कुल',nt:'नहीं देखा',seen:'देखा',learned:'सीखा',needrev:'पुनरावृत्ति चाहिए',flagged:'फ्लैग किया',selectStage:'चरण चुनें',papers:'पेपर',topics:'विषय',chapters:'अध्याय',noNotes:'नोट्स नहीं जोड़े',lv:'अंतिम बार:',notYet:'अभी नहीं देखा',mark:'चिह्नित:',tapFlip:'फ्लिप करें',reveal:'उत्तर देखें',complete:'% पूर्ण',revs:'पुन.',emptyT:'नोट्स नहीं जोड़े गए',emptyD:'Claude के साथ नोट्स बनाएं → JSON → यहाँ पेस्ट करें।',saving:'सहेज रहे हैं...'}
+};
+const tx=()=>TX[lang];
+
+// ══ PASSKEY HELPERS ══
+function getPK(inputId){return(document.getElementById(inputId)?.value||'').replace(/\D/g,'').slice(0,6);}
+function clearPK(...ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';})}
+
+// ══ SCREENS ══
+function showScreen(id){
+  ['screen-welcome','screen-register','screen-login'].forEach(s=>{
+    const el=document.getElementById(s);if(el)el.style.display='none';
+  });
+  const el=document.getElementById(id);if(el)el.style.display='flex';
+}
+
+// ══ API ══
+function showLoading(msg='Please wait...'){document.getElementById('loading-text').textContent=msg;document.getElementById('loading').style.display='flex';}
+function hideLoading(){document.getElementById('loading').style.display='none';}
+async function apiCall(data){
+  try{
+    const r=await fetch(API,{method:'POST',body:JSON.stringify(data)});
+    return await r.json();
+  }catch(e){return{success:false,message:'Network error. Check your connection.'};}
+}
+
+// ══ REGISTER ══
+async function doRegister(){
+  const fname=document.getElementById('reg-fname').value.trim();
+  const lname=document.getElementById('reg-lname').value.trim();
+  const dob=document.getElementById('reg-dob').value;
+  const year=document.getElementById('reg-year').value;
+  const score=document.getElementById('reg-score').value;
+  const optional=document.getElementById('reg-optional').value;
+  const pk=getPK('reg-pk-input');
+  const pkConfirm=getPK('reg-confirm-pk-input');
+  const err=document.getElementById('reg-error');
+  if(!fname||!lname){err.textContent='First and last name are required.';return;}
+  if(!dob){err.textContent='Date of birth is required.';return;}
+  if(!year){err.textContent='Target year is required.';return;}
+  if(pk.length!==6){err.textContent='Please set a 6-digit passkey.';return;}
+  if(pk!==pkConfirm){err.textContent='Passkeys do not match.';return;}
+  err.textContent='';
+  showLoading('Creating your account...');
+  const res=await apiCall({action:'register',firstName:fname,lastName:lname,dob,targetYear:year,optionalSubject:optional,lastScore:score,passkey:pk});
+  hideLoading();
+  if(res.success){showToast('Account created! Welcome '+fname+' 🎉');setTimeout(()=>doLoginDirect(fname,lname,pk),1000);}
+  else{err.textContent=res.message||'Registration failed. Try again.';}
+}
+
+// ══ LOGIN ══
+async function doLogin(){
+  const fname=document.getElementById('login-fname').value.trim();
+  const lname=document.getElementById('login-lname').value.trim();
+  const pk=getPK('login-pk-input');
+  const err=document.getElementById('login-error');
+  if(!fname||!lname){err.textContent='Enter your first and last name.';return;}
+  if(pk.length!==6){err.textContent='Enter your 6-digit passkey.';return;}
+  err.textContent='';
+  await doLoginDirect(fname,lname,pk);
+}
+async function doLoginDirect(fname,lname,pk){
+  showLoading('Signing you in...');
+  const res=await apiCall({action:'login',firstName:fname,lastName:lname,passkey:pk});
+  hideLoading();
+  if(res.success){
+    currentUser={firstName:fname,lastName:lname,passkey:pk,...res.profile};
+    localStorage.setItem('upsc-user',JSON.stringify({firstName:fname,lastName:lname,passkey:pk}));
+    showLoading('Loading your progress...');
+    const progRes=await apiCall({action:'loadProgress',firstName:fname,lastName:lname});
+    hideLoading();
+    progress=progRes.success?progRes.progress:{};
+    enterApp();
+  }else{
+    const err=document.getElementById('login-error');
+    if(err)err.textContent=res.message||'Sign in failed.';
+    showToast(res.message||'Sign in failed','err');
+  }
+}
+
+// ══ AUTO LOGIN ══
+window.addEventListener('load',async()=>{
+  const saved=localStorage.getItem('upsc-user');
+  if(saved){
+    try{
+      const u=JSON.parse(saved);
+      showLoading('Welcome back...');
+      const res=await apiCall({action:'login',firstName:u.firstName,lastName:u.lastName,passkey:u.passkey});
+      if(res.success){
+        currentUser={...u,...res.profile};
+        const progRes=await apiCall({action:'loadProgress',firstName:u.firstName,lastName:u.lastName});
+        progress=progRes.success?progRes.progress:{};
+        hideLoading();enterApp();return;
+      }
+    }catch(e){}
+    hideLoading();
+  }
+  showScreen('screen-welcome');
+});
+
+// ══ ENTER APP ══
+function enterApp(){
+  ['screen-welcome','screen-register','screen-login'].forEach(s=>{const el=document.getElementById(s);if(el)el.style.display='none';});
+  document.getElementById('app').style.display='block';
+  setLang(lang);renderHome();setNav([]);updateSideMenu();
+}
+
+// ══ SIGN OUT ══
+function signOut(){
+  localStorage.removeItem('upsc-user');currentUser=null;progress={};
+  document.getElementById('app').style.display='none';
+  stopTimer();showScreen('screen-welcome');toggleMenu();
+  showToast('Signed out successfully');
+}
+
+// ══ LANG ══
+function setLang(l){
+  lang=l;localStorage.setItem('upsc-lang',l);
+  ['lb-en','lb-hi','wlb-en','wlb-hi'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',id.endsWith(l==='en'?'en':'hi'));});
+  const ap=document.querySelector('.page.active');
+  if(ap){
+    if(ap.id==='pg-home')renderHome();
+    else if(ap.id==='pg-stage')renderStage(curStage);
+    else if(ap.id==='pg-paper')renderPaper(curStage,curPaper);
+    else if(ap.id==='pg-topic')renderTopic(curStage,curPaper,curTopic);
+    else if(ap.id==='pg-chapter')renderChapter(curStage,curPaper,curTopic,curChapter);
+    else if(ap.id==='pg-account')renderAccount();
+  }
+}
+
+// ══ SIDE MENU ══
+function toggleMenu(){
+  document.getElementById('side-menu').classList.toggle('open');
+  document.getElementById('side-overlay').classList.toggle('open');
+}
+function updateSideMenu(){
+  if(!currentUser)return;
+  const initials=(currentUser.firstName?.[0]||'')+(currentUser.lastName?.[0]||'');
+  document.getElementById('sm-avatar').textContent=initials.toUpperCase();
+  document.getElementById('sm-name').textContent=(currentUser.firstName||'')+' '+(currentUser.lastName||'');
+  document.getElementById('sm-meta').textContent='Target: '+(currentUser.targetYear||'—')+' | '+(currentUser.optionalSubject||'No Optional');
+  document.getElementById('home-avatar').textContent=initials.toUpperCase();
+  document.getElementById('home-welcome').textContent='Hey, '+(currentUser.firstName||'')+'! 👋';
+  const dob=currentUser.dob||currentUser.VALUE;
+  const age=dob?Math.floor((new Date()-new Date(dob))/(365.25*24*3600*1000)):'—';
+  document.getElementById('home-meta').textContent='Age: '+age+' | Target: '+(currentUser.targetYear||'—')+' | '+(currentUser.optionalSubject||'No optional selected');
+}
+function navTo(page){
+  toggleMenu();
+  if(page==='home')goHome();
+  else if(page==='account'){showPageEl('pg-account');setNav([{label:lang==='hi'?'मेरा खाता':'My Account'}]);renderAccount();}
+}
+
+// ══ NAV ══
+// Page history stack for back button
+let pageHistory=[];
+function showPageEl(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function setNav(items){
+  const nc=document.getElementById('nav-c');
+  const backBtn=document.getElementById('nav-back');
+  if(!items.length){
+    nc.innerHTML='<span class="nav-title">UPSC Study OS</span>';
+    if(backBtn)backBtn.classList.remove('visible');
+    return;
+  }
+  nc.innerHTML='<div class="nav-bc"><span class="bc-item" onclick="goHome()">🏠</span>'+items.map((it,i)=>`<span class="bc-sep">›</span><span class="bc-item${i===items.length-1?' cur':''}" ${it.fn?`onclick="${it.fn}"`:''}>${it.label}</span>`).join('')+'</div>';
+  if(backBtn)backBtn.classList.add('visible');
+}
+function goBack(){
+  // Navigate to the second-to-last breadcrumb item
+  const nc=document.getElementById('nav-c');
+  const items=nc.querySelectorAll('.bc-item');
+  // items[0] = 🏠, items[1] = stage, items[2] = paper, etc.
+  // Click second-to-last item (parent of current page)
+  if(items.length>=2){
+    const parent=items[items.length-2];
+    if(parent&&parent.onclick)parent.click();
+    else goHome();
+  } else {
+    goHome();
+  }
+}
+
+// ══ PROGRESS ══
+function getCP(id){return progress[id]||{status:'not-visited',tags:[],lastVisited:null,sectionRevs:{concepts:0,theory:0,facts:0,dates:0,pyqs:0,brainteasers:0},sectionVisited:{}};}
+function setCP(id,data){progress[id]={...getCP(id),...data};saveProgressDebounced();}
+let saveTimer=null;
+function saveProgressDebounced(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(currentUser)apiCall({action:'saveProgress',firstName:currentUser.firstName,lastName:currentUser.lastName,progress});},3000);}
+function allChapters(){const a=[];['prelims','mains'].forEach(s=>SYL[s].papers.forEach(pa=>pa.topics.forEach(tp=>tp.chapters.forEach(ch=>a.push(ch.id)))));return a;}
+
+// ══ METRICS ══
+function updateMetrics(){
+  const all=allChapters();
+  let nt=0,seen=0,lrn=0,rev=0,flg=0;
+  all.forEach(id=>{const p=progress[id]||{};if((p.status||'not-visited')==='not-visited')nt++;else seen++;if((p.tags||[]).includes('learned'))lrn++;if((p.tags||[]).includes('revision'))rev++;if((p.tags||[]).includes('flag'))flg++;});
+  document.getElementById('m-tot').textContent=all.length;document.getElementById('m-nt').textContent=nt;document.getElementById('m-seen').textContent=seen;document.getElementById('m-lrn').textContent=lrn;document.getElementById('m-rev').textContent=rev;document.getElementById('m-flg').textContent=flg;
+  ['prelims','mains'].forEach(s=>{
+    const chs=SYL[s].papers.flatMap(pa=>pa.topics.flatMap(tp=>tp.chapters.map(c=>c.id)));
+    const ln=chs.filter(id=>(progress[id]?.tags||[]).includes('learned')).length;
+    const pct=chs.length?Math.round(ln/chs.length*100):0;
+    document.getElementById(s==='prelims'?'pre-f':'main-f').style.width=pct+'%';
+    document.getElementById(s==='prelims'?'pre-p':'main-p').textContent=pct+tx().complete;
+  });
+}
+
+// ══ HOME ══
+function renderHome(){
+  const t=tx();
+  document.getElementById('opl').textContent=t.overall;document.getElementById('ml-tot').textContent=t.total;document.getElementById('ml-nt').textContent=t.nt;document.getElementById('ml-seen').textContent=t.seen;document.getElementById('ml-lrn').textContent=t.learned;document.getElementById('ml-rev').textContent=t.needrev;document.getElementById('ml-flg').textContent=t.flagged;
+  document.getElementById('ssl').textContent=t.selectStage;
+  document.getElementById('pre-t').textContent=SYL.prelims[lang].name;document.getElementById('pre-d').textContent=SYL.prelims[lang].desc;
+  document.getElementById('main-t').textContent=SYL.mains[lang].name;document.getElementById('main-d').textContent=SYL.mains[lang].desc;
+  updateSideMenu();updateMetrics();
+}
+function goHome(){stopTimer();curStage=null;curPaper=null;curTopic=null;curChapter=null;showPageEl('pg-home');setNav([]);renderHome();}
+
+// ══ STAGE ══
+function goStage(s){curStage=s;curPaper=null;curTopic=null;curChapter=null;renderStage(s);showPageEl('pg-stage');setNav([{label:SYL[s][lang].name,fn:`goStage('${s}')`}]);}
+function renderStage(s){
+  const stage=SYL[s],t=tx();
+  document.getElementById('st-t').textContent=stage[lang].name;document.getElementById('st-d').textContent=stage[lang].desc;
+  document.getElementById('papers-lbl').textContent=t.papers;
+  document.getElementById('paper-grid').innerHTML=stage.papers.map(pa=>{
+    const allCh=pa.topics.flatMap(tp=>tp.chapters.map(c=>c.id)),total=allCh.length;
+    const lrn=allCh.filter(id=>(progress[id]?.tags||[]).includes('learned')).length;
+    const seen=allCh.filter(id=>progress[id]?.status==='seen').length;
+    const pct=total?Math.round(lrn/total*100):0;
+    return`<div class="paper-card" onclick="goPaper('${s}','${pa.id}')"><div class="paper-top"><span class="paper-icon">${pa.icon}</span><div><div class="paper-name">${pa[lang].name}</div><div class="paper-desc">${pa[lang].desc}</div></div></div><div class="paper-stats"><span class="sp sp-gray">${total} ch</span><span class="sp sp-blue">${seen} ${t.seen.toLowerCase()}</span><span class="sp sp-grn">${lrn} ${t.learned.toLowerCase()}</span></div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div></div>`;
+  }).join('');
+}
+
+// ══ PAPER ══
+function goPaper(s,paId){curStage=s;curPaper=paId;curTopic=null;curChapter=null;renderPaper(s,paId);showPageEl('pg-paper');const pa=SYL[s].papers.find(p=>p.id===paId);setNav([{label:SYL[s][lang].name,fn:`goStage('${s}')`},{label:pa[lang].name,fn:`goPaper('${s}','${paId}')`}]);}
+function renderPaper(s,paId){
+  const pa=SYL[s].papers.find(p=>p.id===paId),t=tx();
+  document.getElementById('pa-t').textContent=pa[lang].name;document.getElementById('pa-d').textContent=pa[lang].desc;
+  document.getElementById('topics-lbl').textContent=t.topics;
+  document.getElementById('topic-list').innerHTML=pa.topics.map(tp=>{
+    const allCh=tp.chapters.map(c=>c.id),total=allCh.length;
+    const lrn=allCh.filter(id=>(progress[id]?.tags||[]).includes('learned')).length;
+    const seen=allCh.filter(id=>progress[id]?.status==='seen').length;
+    return`<div class="topic-card" onclick="goTopic('${s}','${paId}','${tp.id}')"><div class="topic-top"><span class="topic-icon">${tp.icon}</span><div style="flex:1"><div class="topic-name">${tp[lang].name}</div><div class="topic-meta">${tp[lang].desc}</div></div><div class="topic-arr">›</div></div><div class="topic-stats"><span class="sp sp-gray">${total} ${t.chapters}</span><span class="sp sp-blue">${seen} ${t.seen.toLowerCase()}</span><span class="sp sp-grn">${lrn} ${t.learned.toLowerCase()}</span></div></div>`;
+  }).join('');
+}
+
+// ══ TOPIC ══
+function goTopic(s,paId,tpId){curStage=s;curPaper=paId;curTopic=tpId;curChapter=null;renderTopic(s,paId,tpId);showPageEl('pg-topic');const pa=SYL[s].papers.find(p=>p.id===paId);const tp=pa.topics.find(t=>t.id===tpId);setNav([{label:SYL[s][lang].name,fn:`goStage('${s}')`},{label:pa[lang].name,fn:`goPaper('${s}','${paId}')`},{label:tp[lang].name,fn:`goTopic('${s}','${paId}','${tpId}')`}]);}
+function renderTopic(s,paId,tpId){
+  const pa=SYL[s].papers.find(p=>p.id===paId),tp=pa.topics.find(t=>t.id===tpId),t2=tx();
+  document.getElementById('tp-t').textContent=tp[lang].name;document.getElementById('tp-d').textContent=tp[lang].desc;
+  document.getElementById('chapters-lbl').textContent=t2.chapters;
+  document.getElementById('chapter-cards').innerHTML=tp.chapters.map((ch,i)=>{
+    const p=progress[ch.id]||{},tags=p.tags||[],status=p.status||'not-visited',hasNotes=!!NOTES[ch.id];
+    const sRevs=p.sectionRevs||{},totalRevs=Object.values(sRevs).reduce((a,b)=>a+b,0);
+    const sectsDone=SMETA.filter(sm=>(sRevs[sm.id]||0)>=3).length,progPct=hasNotes?Math.round(sectsDone/6*100):0;
+    let cardCls='';if(tags.includes('flag'))cardCls='st-flagged';else if(tags.includes('learned'))cardCls='st-learned';else if(status==='seen')cardCls='st-seen';
+    const stTag=!hasNotes?`<span class="ct ct-nonotes">${t2.noNotes}</span>`:status==='not-visited'?`<span class="ct ct-nt">● ${t2.nt}</span>`:`<span class="ct ct-seen">👁 ${t2.seen}</span>`;
+    const manTags=tags.map(tg=>({flag:'<span class="ct ct-flag">🚩</span>',learned:'<span class="ct ct-learned">✅</span>',imp:'<span class="ct ct-imp">⭐</span>',forgetting:'<span class="ct ct-forget">💀</span>',revision:'<span class="ct ct-rev">🔁</span>'}[tg]||'')).join('');
+    const secPills=hasNotes?SMETA.map(sm=>{const r=sRevs[sm.id]||0;const cls=r>=3?'sp-done':r>0?'sp-partial':'sp-none';return`<span class="sec-pill ${cls}">${sm.icon}${r>0?' '+r+t2.revs:''}</span>`;}).join(''):'';
+    const progColor=progPct>=80?'var(--mastered)':progPct>=40?'var(--highyield)':'var(--memorize)';
+    return`<div class="chapter-card ${cardCls}" onclick="goChapter('${s}','${paId}','${tpId}','${ch.id}')">
+      <div class="cc-top"><div class="cc-num">${i+1}</div><div><div class="cc-name">${ch[lang]}</div><div class="cc-last">${p.lastVisited?t2.lv+' '+p.lastVisited:t2.notYet}</div></div></div>
+      ${hasNotes?`<div class="cc-sections">${secPills}</div>`:''}
+      <div class="cc-tags">${stTag}${manTags}${totalRevs>0?`<span class="ct" style="background:var(--surface2);color:var(--text-muted);font-size:10px">${totalRevs} total ${t2.revs}</span>`:''}</div>
+      ${hasNotes?`<div class="cc-prog"><div class="cc-prog-bar"><div class="cc-prog-fill" style="width:${progPct}%;background:${progColor}"></div></div><div class="cc-prog-lbl">${progPct}% sections revised</div></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ══ CHAPTER ══
+function goChapter(s,paId,tpId,chId){
+  stopTimer();curStage=s;curPaper=paId;curTopic=tpId;curChapter=chId;
+  const now=new Date().toLocaleDateString(lang==='hi'?'hi-IN':'en-IN',{day:'numeric',month:'short',year:'numeric'});
+  setCP(chId,{status:'seen',lastVisited:now});
+  renderChapter(s,paId,tpId,chId);showPageEl('pg-chapter');
+  const pa=SYL[s].papers.find(p=>p.id===paId),tp=pa.topics.find(t=>t.id===tpId),ch=tp.chapters.find(c=>c.id===chId);
+  setNav([{label:SYL[s][lang].name,fn:`goStage('${s}')`},{label:pa[lang].name,fn:`goPaper('${s}','${paId}')`},{label:tp[lang].name,fn:`goTopic('${s}','${paId}','${tpId}')`},{label:ch[lang]}]);
+}
+function renderChapter(s,paId,tpId,chId){
+  const pa=SYL[s].papers.find(p=>p.id===paId),tp=pa.topics.find(t=>t.id===tpId),ch=tp.chapters.find(c=>c.id===chId);
+  const p=getCP(chId),t=tx(),notes=NOTES[chId]?.[lang],sRevs=p.sectionRevs||{};
+  document.getElementById('ch-t').textContent=ch[lang];
+  document.getElementById('ch-bc').textContent=SYL[s][lang].name+' › '+pa[lang].name+' › '+tp[lang].name;
+  document.getElementById('lv-txt').textContent=p.lastVisited?t.lv+' '+p.lastVisited:t.notYet;
+  document.getElementById('mark-lbl').textContent=t.mark;
+  document.getElementById('sec-metrics').innerHTML=SMETA.map(sm=>{
+    const r=sRevs[sm.id]||0,cnt=notes?notes.counts?.[sm.id]||notes[sm.id]?.length||0:0,name=lang==='hi'?sm.hi:sm.en;
+    return`<div class="smc ${sm.cls}" id="smc-${sm.id}"><div class="smc-icon">${sm.icon}</div><div class="smc-name">${name}</div><div class="smc-rev" id="smr-${sm.id}">${r}</div><div class="smc-sub">${cnt?cnt+(lang==='hi'?' आइटम':' items'):'—'}</div><div class="smc-timer" id="smt-${sm.id}"></div></div>`;
+  }).join('');
+  const tags=p.tags||[];
+  ['flag','learned','imp','forgetting','revision'].forEach(tg=>{document.getElementById('tb-'+tg).className='tag-btn'+(tags.includes(tg)?` a-${tg}`:'');});
+  const tabLabels={concepts:{en:'🟣 Concepts',hi:'🟣 अवधारणाएं'},theory:{en:'🟢 Theory',hi:'🟢 सिद्धांत'},facts:{en:'🧠 Facts',hi:'🧠 तथ्य'},dates:{en:'🔴 Dates',hi:'🔴 तिथियां'},pyqs:{en:'🔵 PYQs',hi:'🔵 PYQ'},brainteasers:{en:'🟠 Brain Teasers',hi:'🟠 ब्रेन टीज़र'}};
+  const tabIds={concepts:'st-con',theory:'st-thy',facts:'st-fct',dates:'st-dt',pyqs:'st-pyq',brainteasers:'st-bt'};
+  SMETA.forEach(sm=>{const el=document.getElementById(tabIds[sm.id]);if(el)el.textContent=tabLabels[sm.id][lang];const r=sRevs[sm.id]||0,tab=document.querySelector(`.sec-tab[data-s="${sm.id}"]`);if(!tab)return;let badge=tab.querySelector('.rev-badge');if(r>0){if(!badge){badge=document.createElement('span');badge.className='rev-badge';tab.appendChild(badge);}badge.textContent=r;}else if(badge)badge.remove();});
+  if(!notes){SMETA.forEach(sm=>{document.getElementById('sc-'+sm.id).innerHTML=`<div class="empty"><div class="empty-icon">📭</div><h3>${t.emptyT}</h3><p>${t.emptyD}</p></div>`;});secTimers={};switchSec('concepts');return;}
+  const SHL={concepts:'sh understand',theory:'sh review',facts:'sh memorize',dates:'sh recall',pyqs:'sh pyq',brainteasers:'sh solve'};
+  const SHT={concepts:lang==='hi'?'🟣 अवधारणाएं':'🟣 Concepts',theory:lang==='hi'?'🟢 सिद्धांत':'🟢 Theory',facts:lang==='hi'?'🧠 महत्वपूर्ण तथ्य':'🧠 Important Facts',dates:lang==='hi'?'🔴 तिथियां':'🔴 Important Dates',pyqs:lang==='hi'?'🔵 विगत वर्ष प्रश्न':'🔵 Previous Year Questions',brainteasers:lang==='hi'?'🟠 ब्रेन टीज़र':'🟠 Brain Teasers'};
+  document.getElementById('sc-concepts').innerHTML=`<div class="${SHL.concepts}">${SHT.concepts}</div>`+notes.concepts.map((c,i)=>`<div class="concept-item"><button class="concept-btn" onclick="togCon(${i})"><span>${c.title}</span><span class="con-arr">▼</span></button><div class="concept-body" id="cb-${i}">${c.detail}</div></div>`).join('');
+  document.getElementById('sc-theory').innerHTML=`<div class="${SHL.theory}">${SHT.theory}</div>`+notes.theory.map(th=>`<div class="theory-block"><h4>${th.title}</h4><p>${th.content}</p></div>`).join('');
+  document.getElementById('sc-facts').innerHTML=`<div class="${SHL.facts}">${SHT.facts}</div><p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">${t.tapFlip}</p><div class="fc-grid">`+notes.facts.map((f,i)=>`<div class="flashcard" id="fc-${i}" onclick="flipCard(${i})"><div class="fc-inner"><div class="fc-front"><div class="fc-lbl">${lang==='hi'?'तथ्य':'FACT'}</div><div class="fc-q">${f.q}</div><div class="fc-hint">↕ ${t.tapFlip}</div></div><div class="fc-back"><div class="fc-a">${f.a}</div></div></div></div>`).join('')+'</div>';
+  document.getElementById('sc-dates').innerHTML=`<div class="${SHL.dates}">${SHT.dates}</div><div class="dates-list">`+notes.dates.map(d=>`<div class="date-row"><div class="date-yr">${d.year}</div><div class="date-dot"></div><div><div class="date-ev">${d.event}</div><div class="date-det">${d.detail}</div></div></div>`).join('')+'</div>';
+  document.getElementById('sc-pyqs').innerHTML=`<div class="${SHL.pyqs}">${SHT.pyqs}</div>`+notes.pyqs.map((q,i)=>`<div class="pyq-item"><div class="pyq-hdr"><div class="pyq-badge"><span class="pyq-yr">${q.year}</span><span class="pyq-type">${q.type}</span></div><div class="pyq-q">${q.q}</div></div><button class="pyq-btn" onclick="togPyq(${i})">${t.reveal}</button><div class="pyq-ans" id="pa-${i}">${q.a}</div></div>`).join('');
+  document.getElementById('sc-brainteasers').innerHTML=`<div class="${SHL.brainteasers}">${SHT.brainteasers}</div>`+notes.brainteasers.map((bt,i)=>`<div class="bt-item"><div class="bt-q"><div class="bt-num">${i+1}</div><span>${bt.q}</span></div><button class="bt-btn" onclick="togBt(${i})">${t.reveal}</button><div class="bt-ans" id="ba-${i}">${bt.a}</div></div>`).join('');
+  secTimers={};switchSec('concepts');
+}
+
+// ══ TIMER ══
+function switchSec(sec){
+  stopTimer();
+  document.querySelectorAll('.sec-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sec-content').forEach(c=>c.classList.remove('active'));
+  document.querySelector(`.sec-tab[data-s="${sec}"]`).classList.add('active');
+  document.getElementById('sc-'+sec).classList.add('active');
+  activeSec=sec;
+  if(curChapter){const p=getCP(curChapter);const sv=p.sectionVisited||{};sv[sec]=true;setCP(curChapter,{sectionVisited:sv});}
+  startTimer(sec);
+}
+function startTimer(sec){
+  if(!curChapter)return;
+  if(!secTimers[sec])secTimers[sec]={elapsed:0,interval:null,counted:false};
+  const st=secTimers[sec];if(st.interval)return;
+  st.start=Date.now()-st.elapsed*1000;
+  st.interval=setInterval(()=>{
+    st.elapsed=Math.floor((Date.now()-st.start)/1000);
+    const rem=REV_THRESH-st.elapsed;
+    const timerEl=document.getElementById('smt-'+sec);
+    const tabEl=document.querySelector(`.sec-tab[data-s="${sec}"]`);
+    if(timerEl){
+      if(rem>0){timerEl.textContent=Math.ceil(rem)+'s';if(tabEl&&!tabEl.querySelector('.timer-dot')){const d=document.createElement('span');d.className='timer-dot';tabEl.appendChild(d);}}
+      else{timerEl.textContent='';const dot=tabEl?.querySelector('.timer-dot');if(dot)dot.remove();}
+    }
+    if(st.elapsed>=REV_THRESH&&!st.counted){
+      st.counted=true;clearInterval(st.interval);st.interval=null;
+      const p=getCP(curChapter);const sr=p.sectionRevs||{};sr[sec]=(sr[sec]||0)+1;setCP(curChapter,{sectionRevs:sr});
+      const revEl=document.getElementById('smr-'+sec);if(revEl)revEl.textContent=sr[sec];
+      const tab=document.querySelector(`.sec-tab[data-s="${sec}"]`);
+      let badge=tab?.querySelector('.rev-badge');
+      if(!badge&&tab){badge=document.createElement('span');badge.className='rev-badge';tab.appendChild(badge);}
+      if(badge)badge.textContent=sr[sec];
+      showToast('✅ '+(lang==='hi'?sec+' पुनरावृत्ति गिनी गई':'Revision counted: '+sec),true);
+    }
+  },1000);
+}
+function stopTimer(){
+  if(activeSec&&secTimers[activeSec]){
+    const st=secTimers[activeSec];if(st.interval){clearInterval(st.interval);st.interval=null;}
+    if(st.start)st.elapsed=Math.floor((Date.now()-st.start)/1000);
+    const timerEl=document.getElementById('smt-'+activeSec);if(timerEl)timerEl.textContent='';
+    const dot=document.querySelector(`.sec-tab[data-s="${activeSec}"] .timer-dot`);if(dot)dot.remove();
+  }
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopTimer();else if(activeSec&&curChapter)startTimer(activeSec);});
+
+// ══ INTERACTIONS ══
+function togCon(i){document.getElementById('cb-'+i).classList.toggle('open');document.querySelectorAll('.concept-btn')[i].classList.toggle('open');}
+function flipCard(i){document.getElementById('fc-'+i).classList.toggle('flipped');}
+function togPyq(i){document.getElementById('pa-'+i).classList.toggle('open');}
+function togBt(i){document.getElementById('ba-'+i).classList.toggle('open');}
+function togTag(tag){
+  if(!curChapter)return;
+  const p=getCP(curChapter);const tags=p.tags||[];const idx=tags.indexOf(tag);
+  if(idx===-1)tags.push(tag);else tags.splice(idx,1);setCP(curChapter,{tags});
+  ['flag','learned','imp','forgetting','revision'].forEach(tg=>{document.getElementById('tb-'+tg).className='tag-btn'+(tags.includes(tg)?` a-${tg}`:'');});
+  showToast(tag+(tags.includes(tag)?' ✓ added':' removed'));updateMetrics();
+}
+
+// ══ ACCOUNT PAGE ══
+function renderAccount(){
+  if(!currentUser)return;
+  document.getElementById('acc-fname').value=currentUser.firstName||'';
+  document.getElementById('acc-lname').value=currentUser.lastName||'';
+  document.getElementById('acc-dob').value=currentUser.dob||'';
+  document.getElementById('acc-year').value=currentUser.targetYear||'';
+  document.getElementById('acc-score').value=currentUser.lastScore||'';
+  document.getElementById('acc-optional').value=currentUser.optionalSubject||'';
+  const all=allChapters();
+  const lrn=all.filter(id=>(progress[id]?.tags||[]).includes('learned')).length;
+  const totalRevs=all.reduce((sum,id)=>{const sr=progress[id]?.sectionRevs||{};return sum+Object.values(sr).reduce((a,b)=>a+b,0);},0);
+  document.getElementById('acc-total').textContent=all.length;
+  document.getElementById('acc-learned').textContent=lrn;
+  document.getElementById('acc-revisions').textContent=totalRevs;
+  clearPK('curr-pk-input','new-pk-input');
+}
+async function saveProfile(){
+  if(!currentUser)return;
+  const updates={firstName:document.getElementById('acc-fname').value.trim(),lastName:document.getElementById('acc-lname').value.trim(),dob:document.getElementById('acc-dob').value,targetYear:document.getElementById('acc-year').value,lastScore:document.getElementById('acc-score').value,optionalSubject:document.getElementById('acc-optional').value};
+  showLoading('Saving profile...');
+  const res=await apiCall({action:'updateProfile',firstName:currentUser.firstName,lastName:currentUser.lastName,updates});
+  hideLoading();
+  if(res.success){Object.assign(currentUser,updates);localStorage.setItem('upsc-user',JSON.stringify({firstName:currentUser.firstName,lastName:currentUser.lastName,passkey:currentUser.passkey}));updateSideMenu();showToast('Profile saved ✓');}
+  else showToast('Save failed: '+res.message,'err');
+}
+async function changePasskey(){
+  const currPk=getPK('curr-pk-input');
+  const newPk=getPK('new-pk-input');
+  const err=document.getElementById('pk-error');
+  if(currPk.length!==6){err.textContent='Enter your current passkey.';return;}
+  if(newPk.length!==6){err.textContent='Enter a new 6-digit passkey.';return;}
+  if(currPk!==currentUser.passkey){err.textContent='Current passkey is incorrect.';return;}
+  err.textContent='';
+  showLoading('Updating passkey...');
+  const res=await apiCall({action:'updateProfile',firstName:currentUser.firstName,lastName:currentUser.lastName,updates:{passkey:newPk}});
+  hideLoading();
+  if(res.success){currentUser.passkey=newPk;localStorage.setItem('upsc-user',JSON.stringify({firstName:currentUser.firstName,lastName:currentUser.lastName,passkey:newPk}));showToast('Passkey updated ✓');clearPK('curr-pk-input','new-pk-input');}
+  else showToast('Failed: '+res.message,'err');
+}
+
+// ══ RESET ══
+function openResetModal(){document.getElementById('reset-modal').classList.add('open');document.getElementById('reset-confirm-input').value='';document.getElementById('reset-confirm-btn').disabled=true;}
+function closeResetModal(){document.getElementById('reset-modal').classList.remove('open');}
+function checkResetInput(){document.getElementById('reset-confirm-btn').disabled=document.getElementById('reset-confirm-input').value!=='RESET';}
+async function doReset(){
+  closeResetModal();showLoading('Resetting progress...');
+  const res=await apiCall({action:'resetProgress',firstName:currentUser.firstName,lastName:currentUser.lastName});
+  hideLoading();
+  if(res.success){progress={};updateMetrics();showToast('All progress reset ✓');renderAccount();}
+  else showToast('Reset failed: '+res.message,'err');
+}
+
+// ══ BACKUP ══
+function exportProg(){const blob=new Blob([JSON.stringify(progress,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='upsc-progress-'+new Date().toISOString().split('T')[0]+'.json';a.click();showToast('Exported ✓');}
+function importProg(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{try{progress=JSON.parse(ev.target.result);saveProgressDebounced();showToast('Imported ✓');updateMetrics();}catch{showToast('Invalid file','err');}};r.readAsText(file);e.target.value='';}
+
+// ══ TOAST ══
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);}
+</script></body></html>
